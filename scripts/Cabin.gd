@@ -29,6 +29,8 @@ var lean_angle := deg_to_rad(7.0)
 var lean_offset_x := 0.14
 var lean_speed := 8.5
 var current_speed := 20.0
+var current_fuel := 100.0
+var current_engine_condition := 96.0
 var motion_time := 0.0
 var storm_visual_intensity := 0.28
 var cabin_lights_enabled := true
@@ -152,11 +154,11 @@ func _on_focus_text_changed(text: String) -> void:
 	hint_label.text = text
 
 func _on_resources_changed(fuel: float, cabin_heat: float, engine_condition: float) -> void:
+	current_fuel = fuel
+	current_engine_condition = engine_condition
 	_set_gauge(fuel_needle, fuel / 100.0)
 	_set_gauge(heat_needle, cabin_heat / 100.0)
 	_set_gauge(engine_needle, engine_condition / 100.0)
-	if warning_light != null:
-		warning_light.material_override = mat_red if engine_condition < 45.0 or fuel < 18.0 else mat_green
 
 func _on_toggles_changed(heater_on: bool, cabin_lights_on: bool) -> void:
 	cabin_lights_enabled = cabin_lights_on
@@ -206,20 +208,27 @@ func _update_player_movement(delta: float) -> void:
 func _update_cabin_motion() -> void:
 	var speed_factor := clampf(current_speed / 32.0, 0.0, 1.0)
 	var storm_factor := storm_visual_intensity
-	var shake_strength := 0.006 + speed_factor * 0.012 + storm_factor * 0.012
+	var engine_bad_factor := clampf((45.0 - current_engine_condition) / 35.0, 0.0, 1.0)
+	var shake_strength := 0.006 + speed_factor * 0.012 + storm_factor * 0.012 + engine_bad_factor * 0.02
 	var cabin_shake := Vector3(
-		sin(motion_time * 7.7) * shake_strength * 0.55,
-		sin(motion_time * 11.2) * shake_strength,
+		(sin(motion_time * 7.7) + sin(motion_time * 22.0) * engine_bad_factor * 0.7) * shake_strength * 0.55,
+		(sin(motion_time * 11.2) + sin(motion_time * 27.0) * engine_bad_factor * 0.5) * shake_strength,
 		0.0
 	)
 	var lean_offset := Vector3(lean_amount * lean_offset_x, 0.0, 0.0)
 	camera_pivot.position = base_camera_pivot_position + movement_offset + lean_offset + cabin_shake
+	var engine_jitter := Vector3(
+		sin(motion_time * 31.0) * engine_bad_factor * 0.002,
+		sin(motion_time * 23.0) * engine_bad_factor * 0.0025,
+		sin(motion_time * 19.0) * engine_bad_factor * 0.0018
+	)
+	_apply_camera_rotation(engine_jitter)
 
 	if hanging_charm != null:
-		hanging_charm.rotation.z = sin(motion_time * 2.6) * (0.12 + storm_factor * 0.12)
+		hanging_charm.rotation.z = sin(motion_time * 2.6) * (0.12 + storm_factor * 0.12 + engine_bad_factor * 0.08)
 
-func _apply_camera_rotation() -> void:
-	camera_pivot.rotation = Vector3(pitch, yaw, -lean_amount * lean_angle)
+func _apply_camera_rotation(extra_jitter: Vector3 = Vector3.ZERO) -> void:
+	camera_pivot.rotation = Vector3(pitch, yaw, -lean_amount * lean_angle) + extra_jitter
 
 func _update_wipers() -> void:
 	if left_wiper == null or right_wiper == null:
@@ -237,17 +246,22 @@ func _update_wipers() -> void:
 	right_wiper.rotation.z = angle
 
 func _update_light_flicker(delta: float) -> void:
-	next_light_flicker_time -= delta
+	var low_fuel_factor := clampf((20.0 - current_fuel) / 20.0, 0.0, 1.0)
+	next_light_flicker_time -= delta * lerpf(1.0, 2.8, low_fuel_factor)
 	if next_light_flicker_time <= 0.0:
-		light_flicker_time = 0.18 + absf(sin(motion_time * 1.7)) * 0.16
-		next_light_flicker_time = 3.6 + absf(sin(motion_time * 0.83)) * 4.8
+		light_flicker_time = 0.18 + absf(sin(motion_time * 1.7)) * lerpf(0.16, 0.28, low_fuel_factor)
+		next_light_flicker_time = lerpf(3.6, 1.35, low_fuel_factor) + absf(sin(motion_time * 0.83)) * lerpf(4.8, 1.7, low_fuel_factor)
 
 	var flicker := 1.0
 	if light_flicker_time > 0.0:
 		light_flicker_time -= delta
 		var pulse := absf(sin(motion_time * 82.0))
 		flicker = lerpf(0.42, 1.05, pulse)
+	elif low_fuel_factor > 0.0:
+		var unstable := (sin(motion_time * 14.0) + sin(motion_time * 21.0) * 0.35 + 1.35) / 2.7
+		flicker = lerpf(1.0, lerpf(0.86, 1.02, unstable), low_fuel_factor)
 	_apply_light_levels(flicker)
+	_update_pressure_warning()
 
 func _apply_light_levels(flicker: float) -> void:
 	var cabin_base := 5.4 if cabin_lights_enabled else 0.45
@@ -256,6 +270,17 @@ func _apply_light_levels(flicker: float) -> void:
 		cabin_light.light_energy = cabin_base * flicker
 	if dash_light != null:
 		dash_light.light_energy = dash_base * lerpf(0.82, 1.0, flicker)
+
+func _update_pressure_warning() -> void:
+	if warning_light == null:
+		return
+
+	var warning_active := current_fuel < 20.0 or current_engine_condition < 45.0
+	if warning_active:
+		var blink_on := int(motion_time * 5.0) % 2 == 0
+		warning_light.material_override = mat_red if blink_on else mat_dark
+	else:
+		warning_light.material_override = mat_green
 
 func _update_interaction_feedback(delta: float) -> void:
 	if radio_feedback_timer > 0.0:
