@@ -6,6 +6,7 @@ const CabinInteractableScript := preload("res://scripts/CabinInteractable.gd")
 @onready var camera := $CameraPivot/Camera3D
 @onready var interaction_ray := $CameraPivot/Camera3D/InteractionRay
 
+var base_camera_pivot_position := Vector3.ZERO
 var resource_state: Node
 var radio_system: Node
 var truck_controller: Node
@@ -14,6 +15,9 @@ var event_manager: Node
 var yaw := 0.0
 var pitch := 0.0
 var mouse_sensitivity := 0.0024
+var current_speed := 20.0
+var motion_time := 0.0
+var storm_visual_intensity := 0.0
 
 var hint_label: Label
 var radio_label: Label
@@ -28,6 +32,9 @@ var radio_glow: MeshInstance3D
 var windshield_snow: MeshInstance3D
 var cabin_light: OmniLight3D
 var dash_light: OmniLight3D
+var hanging_charm: MeshInstance3D
+var left_wiper: Node3D
+var right_wiper: Node3D
 
 var mat_warm: StandardMaterial3D
 var mat_warm_dark: StandardMaterial3D
@@ -40,8 +47,10 @@ var mat_green: StandardMaterial3D
 var mat_blue: StandardMaterial3D
 var mat_black: StandardMaterial3D
 var mat_snow: StandardMaterial3D
+var mat_wiper: StandardMaterial3D
 
 func _ready() -> void:
+	base_camera_pivot_position = camera_pivot.position
 	_create_materials()
 	_build_cabin()
 	_build_dashboard()
@@ -67,6 +76,11 @@ func setup(new_resource_state: Node, new_radio_system: Node, new_truck_controlle
 	_on_radio_state_changed(radio_system.is_on)
 	_on_radio_message_changed(radio_system.current_message)
 
+func _process(delta: float) -> void:
+	motion_time += delta
+	_update_cabin_motion()
+	_update_wipers()
+
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		yaw -= event.relative.x * mouse_sensitivity
@@ -74,6 +88,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera_pivot.rotation = Vector3(pitch, yaw, 0.0)
 
 func set_windshield_snow(enabled: bool) -> void:
+	storm_visual_intensity = 1.0 if enabled else 0.0
 	if windshield_snow != null:
 		windshield_snow.visible = enabled
 
@@ -118,8 +133,37 @@ func _on_radio_message_changed(text: String) -> void:
 		radio_label.text = text
 
 func _on_speed_changed(speed: float) -> void:
+	current_speed = speed
 	if speed_label != null:
 		speed_label.text = "%02d KM/H" % int(speed)
+
+func _update_cabin_motion() -> void:
+	var speed_factor := clampf(current_speed / 32.0, 0.0, 1.0)
+	var storm_factor := storm_visual_intensity
+	var shake_strength := 0.006 + speed_factor * 0.012 + storm_factor * 0.012
+	camera_pivot.position = base_camera_pivot_position + Vector3(
+		sin(motion_time * 7.7) * shake_strength * 0.55,
+		sin(motion_time * 11.2) * shake_strength,
+		0.0
+	)
+
+	if hanging_charm != null:
+		hanging_charm.rotation.z = sin(motion_time * 2.6) * (0.12 + storm_factor * 0.12)
+
+func _update_wipers() -> void:
+	if left_wiper == null or right_wiper == null:
+		return
+
+	var sweeping := storm_visual_intensity > 0.0
+	left_wiper.visible = sweeping
+	right_wiper.visible = sweeping
+	if not sweeping:
+		return
+
+	var sweep := (sin(motion_time * 8.0) + 1.0) * 0.5
+	var angle := lerpf(deg_to_rad(-42.0), deg_to_rad(34.0), sweep)
+	left_wiper.rotation.z = angle
+	right_wiper.rotation.z = angle
 
 func _set_gauge(needle: Node3D, normalized_value: float) -> void:
 	if needle == null:
@@ -138,6 +182,7 @@ func _create_materials() -> void:
 	mat_blue = _mat(Color(0.32, 0.56, 0.8), Color(0.1, 0.32, 0.55), 0.65)
 	mat_black = _mat(Color(0.015, 0.014, 0.013), Color.BLACK, 0.0)
 	mat_snow = _mat(Color(0.78, 0.86, 0.94), Color(0.18, 0.26, 0.34), 0.15)
+	mat_wiper = _mat(Color(0.02, 0.018, 0.016), Color.BLACK, 0.0)
 
 	mat_glass = StandardMaterial3D.new()
 	mat_glass.albedo_color = Color(0.36, 0.62, 0.8, 0.18)
@@ -164,6 +209,7 @@ func _build_cabin() -> void:
 
 	windshield_snow = _add_box(self, "WindshieldSnow", Vector3(5.15, 1.2, 0.035), Vector3(0.0, 1.25, -1.82), mat_snow)
 	windshield_snow.visible = false
+	_build_wipers()
 
 func _build_dashboard() -> void:
 	_add_box(self, "AmberDashStrip", Vector3(5.4, 0.08, 0.08), Vector3(0.0, 0.25, -0.86), mat_warm_emissive)
@@ -227,7 +273,23 @@ func _build_personal_objects() -> void:
 	_add_box(self, "Blanket", Vector3(1.4, 0.18, 1.0), Vector3(-2.1, -0.86, 3.6), mat_warm)
 	_add_box(self, "OldPhoto", Vector3(0.55, 0.36, 0.04), Vector3(-1.95, 0.55, -0.76), mat_blue)
 	_add_box(self, "TinCup", Vector3(0.28, 0.34, 0.28), Vector3(1.9, -0.64, -0.35), mat_metal)
-	_add_box(self, "HangingCharm", Vector3(0.12, 0.26, 0.04), Vector3(0.45, 1.82, -1.62), mat_warm_emissive)
+	hanging_charm = _add_box(self, "HangingCharm", Vector3(0.12, 0.26, 0.04), Vector3(0.45, 1.82, -1.62), mat_warm_emissive)
+
+func _build_wipers() -> void:
+	left_wiper = _build_wiper("LeftWiper", Vector3(-1.7, 0.52, -1.78))
+	right_wiper = _build_wiper("RightWiper", Vector3(1.7, 0.52, -1.78))
+	left_wiper.visible = false
+	right_wiper.visible = false
+
+func _build_wiper(name: String, position: Vector3) -> Node3D:
+	var root := Node3D.new()
+	root.name = name
+	root.position = position
+	add_child(root)
+
+	_add_box(root, "Arm", Vector3(0.07, 1.15, 0.035), Vector3(0.0, 0.52, 0.0), mat_wiper)
+	_add_box(root, "Blade", Vector3(0.11, 0.18, 0.045), Vector3(0.0, 1.08, 0.0), mat_wiper)
+	return root
 
 func _build_lights() -> void:
 	cabin_light = OmniLight3D.new()

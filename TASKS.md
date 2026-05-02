@@ -50,3 +50,9 @@
 - [x] visual smoke test
 - [x] basic gameplay smoke test
 - [x] cabin visual polish after test
+
+## ATMOSPHERE PASS
+- [x] subtle seated cabin motion
+- [x] swinging hanging charm
+- [x] storm windshield wipers
+- [x] docs updated for atmosphere pass

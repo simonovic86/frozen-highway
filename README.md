@@ -28,6 +28,7 @@ Implemented:
 - fuel/heat/engine state
 - diegetic dashboard gauges
 - timed events: radio distress signal, snowstorm, suspicious headlights, abandoned vehicle
+- atmospheric cabin motion, swinging charm, and storm wipers
 
 ## Engine
 
@@ -81,4 +82,4 @@ scripts/ResourceState.gd
 3. Press W/S and confirm the dashboard speed readout changes.
 4. Look down at the radio, heater, or overhead light switch and press E, or use R/H/L shortcuts.
 5. Watch the gauges move over time as fuel drains, heat changes, and engine condition slowly wears.
-6. Wait for timed events: a radio distress message, a snowstorm windshield overlay, suspicious headlights, and an abandoned vehicle.
+6. Wait for timed events: a radio distress message, a snowstorm windshield overlay with wipers, suspicious headlights, and an abandoned vehicle.
