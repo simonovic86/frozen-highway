@@ -43,7 +43,7 @@ func _trigger_next_event() -> void:
 	match kind:
 		"radio_distress":
 			if radio_system != null:
-				radio_system.broadcast_event_message("...anyone on Route 9... do not stop near the black lights...", 12.0)
+				radio_system.broadcast_event_message("...anyone on Route 9... do not stop near the black lights. company will bill your next of kin...", 12.0)
 		"snowstorm":
 			storm_timer = 14.0
 			if resource_state != null:
@@ -63,4 +63,4 @@ func _trigger_next_event() -> void:
 			if road_generator != null:
 				road_generator.spawn_abandoned_vehicle()
 			if radio_system != null:
-				radio_system.broadcast_event_message("...wreck in the lane ahead. ease past it. no stopping...", 9.0)
+				radio_system.broadcast_event_message("...wreck in the lane ahead. ease past it. no stopping. survivors get colder after paperwork...", 9.0)

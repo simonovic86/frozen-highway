@@ -13,7 +13,9 @@ var static_messages := [
 	"...static... route marker lost in whiteout...",
 	"...heater line holding... keep moving...",
 	"...black lights past kilometer nine... do not stop...",
-	"...northbound lane closed by ice wrecks..."
+	"...northbound lane closed by ice wrecks...",
+	"...dispatch says morale is optional. diesel is not...",
+	"...if the road starts answering, let it finish first..."
 ]
 
 func _ready() -> void:
