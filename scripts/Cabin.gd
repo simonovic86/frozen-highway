@@ -48,6 +48,10 @@ var mat_blue: StandardMaterial3D
 var mat_black: StandardMaterial3D
 var mat_snow: StandardMaterial3D
 var mat_wiper: StandardMaterial3D
+var mat_grime: StandardMaterial3D
+var mat_rust: StandardMaterial3D
+var mat_paper: StandardMaterial3D
+var mat_cloth: StandardMaterial3D
 
 func _ready() -> void:
 	base_camera_pivot_position = camera_pivot.position
@@ -172,17 +176,21 @@ func _set_gauge(needle: Node3D, normalized_value: float) -> void:
 	needle.rotation.z = angle
 
 func _create_materials() -> void:
-	mat_warm = _mat(Color(0.78, 0.42, 0.18), Color(0.8, 0.32, 0.07), 0.08)
-	mat_warm_dark = _mat(Color(0.22, 0.13, 0.08), Color(0.55, 0.18, 0.05), 0.18)
+	mat_warm = _mat(Color(0.5, 0.27, 0.13), Color(0.45, 0.18, 0.04), 0.04)
+	mat_warm_dark = _mat(Color(0.15, 0.095, 0.065), Color(0.36, 0.12, 0.03), 0.08)
 	mat_warm_emissive = _mat(Color(1.0, 0.58, 0.18), Color(1.0, 0.38, 0.08), 1.8)
-	mat_dark = _mat(Color(0.075, 0.055, 0.045), Color(0.15, 0.05, 0.015), 0.04)
-	mat_metal = _mat(Color(0.18, 0.17, 0.16), Color.BLACK, 0.0)
+	mat_dark = _mat(Color(0.048, 0.042, 0.036), Color(0.08, 0.025, 0.01), 0.025)
+	mat_metal = _mat(Color(0.12, 0.115, 0.105), Color.BLACK, 0.0)
 	mat_red = _mat(Color(1.0, 0.12, 0.05), Color(1.0, 0.05, 0.0), 1.7)
 	mat_green = _mat(Color(0.1, 0.9, 0.38), Color(0.0, 0.8, 0.22), 1.3)
 	mat_blue = _mat(Color(0.32, 0.56, 0.8), Color(0.1, 0.32, 0.55), 0.65)
 	mat_black = _mat(Color(0.015, 0.014, 0.013), Color.BLACK, 0.0)
 	mat_snow = _mat(Color(0.78, 0.86, 0.94), Color(0.18, 0.26, 0.34), 0.15)
 	mat_wiper = _mat(Color(0.02, 0.018, 0.016), Color.BLACK, 0.0)
+	mat_grime = _mat(Color(0.035, 0.03, 0.024), Color.BLACK, 0.0)
+	mat_rust = _mat(Color(0.36, 0.12, 0.045), Color.BLACK, 0.0)
+	mat_paper = _mat(Color(0.74, 0.68, 0.52), Color.BLACK, 0.0)
+	mat_cloth = _mat(Color(0.18, 0.24, 0.28), Color.BLACK, 0.0)
 
 	mat_glass = StandardMaterial3D.new()
 	mat_glass.albedo_color = Color(0.36, 0.62, 0.8, 0.18)
@@ -192,23 +200,34 @@ func _create_materials() -> void:
 	mat_glass.emission_energy_multiplier = 0.3
 
 func _build_cabin() -> void:
-	_add_box(self, "Floor", Vector3(6.8, 0.18, 7.2), Vector3(0.0, -1.0, 1.7), mat_dark)
-	_add_box(self, "Roof", Vector3(6.8, 0.2, 7.2), Vector3(0.0, 2.55, 1.7), mat_dark)
-	_add_box(self, "LeftWall", Vector3(0.22, 3.2, 6.6), Vector3(-3.45, 0.55, 1.7), mat_metal)
-	_add_box(self, "RightWall", Vector3(0.22, 3.2, 6.6), Vector3(3.45, 0.55, 1.7), mat_metal)
-	_add_box(self, "BackWall", Vector3(6.8, 3.2, 0.22), Vector3(0.0, 0.55, 5.0), mat_dark)
-	_add_box(self, "DashBulk", Vector3(6.1, 0.9, 0.85), Vector3(0.0, -0.28, -1.36), mat_warm_dark)
+	var floor := _add_box(self, "Floor", Vector3(6.8, 0.18, 7.2), Vector3(0.0, -1.0, 1.7), mat_dark)
+	floor.rotation_degrees.z = -0.25
+	var roof := _add_box(self, "Roof", Vector3(6.8, 0.2, 7.2), Vector3(-0.06, 2.55, 1.74), mat_dark)
+	roof.rotation_degrees.z = 0.65
+	var left_wall := _add_box(self, "LeftWall", Vector3(0.22, 3.2, 6.6), Vector3(-3.45, 0.55, 1.68), mat_metal)
+	left_wall.rotation_degrees.z = -0.35
+	var right_wall := _add_box(self, "RightWall", Vector3(0.22, 3.08, 6.45), Vector3(3.39, 0.5, 1.77), mat_metal)
+	right_wall.rotation_degrees.z = 0.55
+	var back_wall := _add_box(self, "BackWall", Vector3(6.65, 3.2, 0.22), Vector3(-0.08, 0.55, 5.0), mat_dark)
+	back_wall.rotation_degrees.y = -0.7
+	var dash_bulk := _add_box(self, "DashBulk", Vector3(6.1, 0.9, 0.85), Vector3(0.07, -0.28, -1.36), mat_warm_dark)
+	dash_bulk.rotation_degrees.y = -0.8
 
 	_add_box(self, "WindshieldGlass", Vector3(5.3, 1.35, 0.04), Vector3(0.0, 1.25, -1.86), mat_glass)
-	_add_box(self, "WindshieldTopFrame", Vector3(5.8, 0.18, 0.18), Vector3(0.0, 2.05, -1.78), mat_dark)
-	_add_box(self, "WindshieldBottomFrame", Vector3(5.8, 0.18, 0.18), Vector3(0.0, 0.48, -1.78), mat_dark)
-	_add_box(self, "LeftAFrame", Vector3(0.18, 1.7, 0.18), Vector3(-2.95, 1.25, -1.78), mat_dark)
-	_add_box(self, "RightAFrame", Vector3(0.18, 1.7, 0.18), Vector3(2.95, 1.25, -1.78), mat_dark)
+	var top_frame := _add_box(self, "WindshieldTopFrame", Vector3(5.8, 0.18, 0.18), Vector3(-0.04, 2.04, -1.78), mat_dark)
+	top_frame.rotation_degrees.z = 0.45
+	var bottom_frame := _add_box(self, "WindshieldBottomFrame", Vector3(5.65, 0.18, 0.18), Vector3(0.06, 0.48, -1.78), mat_dark)
+	bottom_frame.rotation_degrees.z = -0.3
+	var left_a_frame := _add_box(self, "LeftAFrame", Vector3(0.18, 1.7, 0.18), Vector3(-2.95, 1.25, -1.78), mat_dark)
+	left_a_frame.rotation_degrees.z = -1.4
+	var right_a_frame := _add_box(self, "RightAFrame", Vector3(0.18, 1.62, 0.18), Vector3(2.91, 1.22, -1.78), mat_dark)
+	right_a_frame.rotation_degrees.z = 1.0
 	_add_box(self, "LeftSideWindow", Vector3(0.04, 1.0, 1.4), Vector3(-3.34, 1.15, 0.7), mat_glass)
 	_add_box(self, "RightSideWindow", Vector3(0.04, 1.0, 1.4), Vector3(3.34, 1.15, 0.7), mat_glass)
 
 	windshield_snow = _add_box(self, "WindshieldSnow", Vector3(5.15, 1.2, 0.035), Vector3(0.0, 1.25, -1.82), mat_snow)
 	windshield_snow.visible = false
+	_build_wear_marks()
 	_build_wipers()
 
 func _build_dashboard() -> void:
@@ -270,10 +289,44 @@ func _build_gauge(name: String, label: String, position: Vector3) -> Node3D:
 	return needle
 
 func _build_personal_objects() -> void:
-	_add_box(self, "Blanket", Vector3(1.4, 0.18, 1.0), Vector3(-2.1, -0.86, 3.6), mat_warm)
+	var blanket := _add_box(self, "Blanket", Vector3(1.4, 0.18, 1.0), Vector3(-2.1, -0.86, 3.6), mat_cloth)
+	blanket.rotation_degrees.y = -6.0
+	_add_box(self, "BlanketFold", Vector3(1.15, 0.16, 0.28), Vector3(-2.22, -0.7, 3.18), mat_warm)
 	_add_box(self, "OldPhoto", Vector3(0.55, 0.36, 0.04), Vector3(-1.95, 0.55, -0.76), mat_blue)
-	_add_box(self, "TinCup", Vector3(0.28, 0.34, 0.28), Vector3(1.9, -0.64, -0.35), mat_metal)
+	_add_box(self, "PhotoBorder", Vector3(0.65, 0.45, 0.025), Vector3(-1.95, 0.55, -0.79), mat_paper)
+	var tin_cup := _add_box(self, "TinCup", Vector3(0.28, 0.34, 0.28), Vector3(1.9, -0.64, -0.35), mat_metal)
+	tin_cup.rotation_degrees.z = 7.0
+	_add_box(self, "Thermos", Vector3(0.24, 0.58, 0.24), Vector3(2.55, -0.54, 0.18), mat_blue)
+	_add_box(self, "ThermosCap", Vector3(0.2, 0.1, 0.2), Vector3(2.55, -0.2, 0.18), mat_metal)
+	_add_box(self, "Toolbox", Vector3(0.95, 0.42, 0.48), Vector3(-2.35, -0.69, 1.05), mat_rust)
+	_add_box(self, "ToolboxLatch", Vector3(0.24, 0.08, 0.04), Vector3(-2.35, -0.48, 0.8), mat_metal)
+	var wrench := _add_box(self, "LooseWrench", Vector3(0.68, 0.06, 0.09), Vector3(-1.55, -0.86, 1.22), mat_metal)
+	wrench.rotation_degrees.y = 22.0
+	_add_box(self, "WrenchHead", Vector3(0.2, 0.08, 0.16), Vector3(-1.24, -0.85, 1.35), mat_metal)
+	var map := _add_box(self, "FoldedMap", Vector3(0.86, 0.02, 0.58), Vector3(0.9, -0.72, 0.9), mat_paper)
+	map.rotation_degrees.y = -18.0
+	_add_box(self, "MapCrease", Vector3(0.035, 0.025, 0.6), Vector3(0.92, -0.7, 0.9), mat_grime)
+	_add_box(self, "FoodCanA", Vector3(0.22, 0.24, 0.22), Vector3(2.85, -0.76, 1.15), mat_metal)
+	_add_box(self, "FoodCanB", Vector3(0.2, 0.2, 0.2), Vector3(2.55, -0.78, 1.32), mat_rust)
+	_add_box(self, "GloveLeft", Vector3(0.52, 0.12, 0.26), Vector3(-0.72, -0.84, 2.86), mat_warm_dark)
+	var glove_right := _add_box(self, "GloveRight", Vector3(0.5, 0.12, 0.26), Vector3(-0.2, -0.84, 2.98), mat_warm_dark)
+	glove_right.rotation_degrees.y = 16.0
 	hanging_charm = _add_box(self, "HangingCharm", Vector3(0.12, 0.26, 0.04), Vector3(0.45, 1.82, -1.62), mat_warm_emissive)
+
+func _build_wear_marks() -> void:
+	var dash_stain := _add_box(self, "DashCoffeeStain", Vector3(0.62, 0.035, 0.34), Vector3(1.72, -0.78, -0.88), mat_grime)
+	dash_stain.rotation_degrees.y = -9.0
+	var dash_scrape := _add_box(self, "DashScrape", Vector3(1.35, 0.045, 0.055), Vector3(-0.95, 0.24, -0.91), mat_rust)
+	dash_scrape.rotation_degrees.z = 1.5
+	_add_box(self, "LeftFloorGrime", Vector3(1.65, 0.035, 1.2), Vector3(-1.1, -0.88, 2.0), mat_grime)
+	_add_box(self, "RightFloorGrime", Vector3(1.1, 0.035, 0.92), Vector3(1.65, -0.88, 2.45), mat_grime)
+	var windshield_smear := _add_box(self, "WindshieldSmear", Vector3(1.5, 0.32, 0.025), Vector3(-1.15, 1.36, -1.835), mat_grime)
+	windshield_smear.rotation_degrees.z = -8.0
+	var right_wall_rust := _add_box(self, "RightWallRustBloom", Vector3(0.026, 0.78, 1.05), Vector3(3.25, 0.05, 2.8), mat_rust)
+	right_wall_rust.rotation_degrees.z = 2.0
+	var left_wall_scratches := _add_box(self, "LeftWallScratches", Vector3(0.026, 1.1, 0.08), Vector3(-3.28, 0.42, 1.2), mat_grime)
+	left_wall_scratches.rotation_degrees.x = 12.0
+	_add_box(self, "UnevenRoofGrime", Vector3(1.4, 0.035, 0.82), Vector3(-1.75, 2.42, 2.75), mat_grime)
 
 func _build_wipers() -> void:
 	left_wiper = _build_wiper("LeftWiper", Vector3(-1.7, 0.52, -1.78))
@@ -375,6 +428,7 @@ func _add_label3d(parent: Node, name: String, text: String, position: Vector3, s
 func _mat(color: Color, emission: Color, emission_energy: float) -> StandardMaterial3D:
 	var material := StandardMaterial3D.new()
 	material.albedo_color = color
+	material.roughness = 0.88
 	if emission_energy > 0.0:
 		material.emission_enabled = true
 		material.emission = emission
