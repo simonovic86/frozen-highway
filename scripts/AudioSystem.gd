@@ -23,6 +23,7 @@ var radio_noise := 0.37
 var speed := 20.0
 var storm_intensity := 0.0
 var radio_on := true
+var radio_burst_timer := 0.0
 
 func setup(new_resource_state: Node, new_radio_system: Node, new_truck_controller: Node, event_manager: Node) -> void:
 	resource_state = new_resource_state
@@ -40,6 +41,8 @@ func setup(new_resource_state: Node, new_radio_system: Node, new_truck_controlle
 		event_manager.event_started.connect(_on_event_started)
 
 func _process(_delta: float) -> void:
+	if radio_burst_timer > 0.0:
+		radio_burst_timer = maxf(0.0, radio_burst_timer - _delta)
 	if resource_state != null:
 		storm_intensity = resource_state.storm_intensity
 	_fill_engine()
@@ -99,6 +102,8 @@ func _fill_radio() -> void:
 		return
 
 	var amplitude := 0.055 if radio_on else 0.0
+	if radio_burst_timer > 0.0:
+		amplitude = 0.18
 	for i in radio_playback.get_frames_available():
 		var sample := _next_noise() * amplitude
 		radio_playback.push_frame(Vector2(sample, sample))
@@ -114,6 +119,8 @@ func _on_radio_state_changed(is_on: bool) -> void:
 	radio_on = is_on
 
 func _on_event_started(kind: String) -> void:
+	if kind == "opening_radio_crackle":
+		radio_burst_timer = 1.2
 	if kind == "snowstorm" and wind_player != null:
 		wind_player.volume_db = -18.0
 	elif wind_player != null:

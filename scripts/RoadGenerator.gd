@@ -4,7 +4,7 @@ extends Node3D
 var drive_speed := 20.0
 var segment_length := 36.0
 var segment_count := 8
-var storm_intensity := 0.0
+var storm_intensity := 0.24
 var rng := RandomNumberGenerator.new()
 
 var segments: Array[Node3D] = []
@@ -64,6 +64,32 @@ func spawn_headlights() -> void:
 
 	event_objects.append(rig)
 
+func spawn_opening_distant_lights() -> void:
+	var rig := Node3D.new()
+	rig.name = "OpeningDistantLights"
+	rig.position = Vector3(-0.6, 1.1, -128.0)
+	rig.set_meta("drift", 0.08)
+	rig.set_meta("phase", rng.randf_range(0.0, TAU))
+	add_child(rig)
+	distant_light_rigs.append(rig)
+
+	for x in [-0.42, 0.42]:
+		var bulb := MeshInstance3D.new()
+		var mesh := SphereMesh.new()
+		mesh.radius = 0.18
+		mesh.height = 0.36
+		bulb.mesh = mesh
+		bulb.material_override = mat_light
+		bulb.position = Vector3(x, 0.0, 0.0)
+		rig.add_child(bulb)
+
+		var lamp := OmniLight3D.new()
+		lamp.light_color = Color(0.72, 0.9, 1.0)
+		lamp.light_energy = 1.8
+		lamp.omni_range = 16.0
+		lamp.position = Vector3(x, 0.0, 0.0)
+		rig.add_child(lamp)
+
 func spawn_abandoned_vehicle() -> void:
 	var wreck := Node3D.new()
 	wreck.name = "AbandonedVehicle"
@@ -118,7 +144,7 @@ func _move_segments(delta: float) -> void:
 func _build_snow() -> void:
 	snow_mesh = BoxMesh.new()
 	snow_mesh.size = Vector3(0.035, 0.035, 0.035)
-	for i in 160:
+	for i in 240:
 		var flake := MeshInstance3D.new()
 		flake.name = "Snowflake%03d" % i
 		flake.mesh = snow_mesh
