@@ -58,12 +58,6 @@ func _unhandled_input(event: InputEvent) -> void:
 		get_viewport().set_input_as_handled()
 	if get_tree().paused:
 		return
-	if event.is_action_pressed("radio_toggle") and radio_system != null:
-		radio_system.toggle_radio()
-	if event.is_action_pressed("heater_toggle") and resource_state != null:
-		resource_state.toggle_heater()
-	if event.is_action_pressed("lights_toggle") and resource_state != null:
-		resource_state.toggle_cabin_lights()
 
 func _setup_environment() -> void:
 	var environment := Environment.new()
@@ -117,9 +111,6 @@ func _set_paused(enabled: bool) -> void:
 
 func _ensure_input_actions() -> void:
 	_add_key_action("interact", KEY_E)
-	_add_key_action("radio_toggle", KEY_R)
-	_add_key_action("heater_toggle", KEY_H)
-	_add_key_action("lights_toggle", KEY_L)
 	_add_key_action("throttle_up", KEY_W)
 	_add_key_action("throttle_down", KEY_S)
 	_add_key_action("cabin_move_left", KEY_A)
