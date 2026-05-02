@@ -101,3 +101,11 @@
 - [x] Delay regular road event loop until after opening beats
 - [x] Add extra lived-in cabin paperwork and mess
 - [x] DESIGN updated for Atmosphere Pass 001
+
+## REACH INTERACTION PASS
+
+- [x] Add max interaction distance per interactable
+- [x] Show “Move closer” hint when looking at object from too far
+- [x] Require player to lean/reposition for radio and heater
+- [x] Keep E as interact
+- [x] Update README controls/testing notes

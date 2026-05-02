@@ -1,6 +1,8 @@
 extends Node3D
 
 const CabinInteractableScript := preload("res://scripts/CabinInteractable.gd")
+const CLOSE_INTERACTION_DISTANCE := 3.45
+const EASY_INTERACTION_DISTANCE := 3.55
 
 @onready var camera_pivot := $CameraPivot
 @onready var camera := $CameraPivot/Camera3D
@@ -323,16 +325,16 @@ func _build_dashboard() -> void:
 	speed_label = _add_label3d(self, "SpeedLabel", "20 KM/H", Vector3(0.0, 0.02, -0.76), 34, Color(1.0, 0.58, 0.18))
 	_add_box(self, "SpeedGlowBacking", Vector3(1.35, 0.05, 0.03), Vector3(0.0, 0.02, -0.785), mat_warm_emissive)
 
-	var radio := _add_interactable("Radio", "radio", "Toggle radio", Vector3(2.25, -0.22, -0.78), Vector3(0.95, 0.46, 0.22), mat_black)
+	var radio := _add_interactable("Radio", "radio", "Toggle radio", Vector3(2.25, -0.22, -0.78), Vector3(0.95, 0.46, 0.22), mat_black, CLOSE_INTERACTION_DISTANCE)
 	radio_glow = _add_box(radio, "RadioGlow", Vector3(0.7, 0.08, 0.025), Vector3(0.0, 0.12, -0.13), mat_green)
 	radio_screen = _add_label3d(radio, "RadioScreen", "RADIO", Vector3(0.0, 0.03, -0.145), 20, Color(0.4, 1.0, 0.55))
 
-	var heater := _add_interactable("Heater", "heater", "Toggle heater", Vector3(-2.25, -0.2, -0.78), Vector3(0.75, 0.42, 0.22), mat_black)
+	var heater := _add_interactable("Heater", "heater", "Toggle heater", Vector3(-2.25, -0.2, -0.78), Vector3(0.75, 0.42, 0.22), mat_black, CLOSE_INTERACTION_DISTANCE)
 	heater_glow = _add_box(heater, "HeaterGlow", Vector3(0.38, 0.1, 0.025), Vector3(0.0, 0.08, -0.13), mat_dark)
 	_add_label3d(heater, "HeaterText", "HEAT", Vector3(0.0, -0.04, -0.145), 24, Color(1.0, 0.55, 0.2))
 	_add_box(self, "FootwellHeaterBleed", Vector3(1.25, 0.05, 0.5), Vector3(-2.18, -0.83, -0.05), mat_warm_emissive)
 
-	_add_interactable("LightSwitch", "lights", "Toggle cabin lights", Vector3(2.72, 1.95, 0.75), Vector3(0.28, 0.34, 0.18), mat_warm)
+	_add_interactable("LightSwitch", "lights", "Toggle cabin lights", Vector3(2.72, 1.95, 0.75), Vector3(0.28, 0.34, 0.18), mat_warm, EASY_INTERACTION_DISTANCE)
 	warning_light = _add_box(self, "WarningLight", Vector3(0.18, 0.18, 0.06), Vector3(1.95, 0.18, -0.76), mat_green)
 
 func _build_steering_wheel() -> void:
@@ -518,10 +520,10 @@ func _build_overlay() -> void:
 	radio_label.modulate = Color(0.6, 1.0, 0.7)
 	layer.add_child(radio_label)
 
-func _add_interactable(name: String, action_id: String, label: String, position: Vector3, size: Vector3, material: Material) -> StaticBody3D:
+func _add_interactable(name: String, action_id: String, label: String, position: Vector3, size: Vector3, material: Material, max_interaction_distance: float = 3.0) -> StaticBody3D:
 	var body: StaticBody3D = CabinInteractableScript.new()
 	body.name = name
-	body.setup(action_id, label)
+	body.setup(action_id, label, max_interaction_distance)
 	body.position = position
 	body.interacted.connect(_on_interactable)
 	add_child(body)
