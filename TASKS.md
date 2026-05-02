@@ -80,3 +80,16 @@
 - [x] Add abandoned vehicle silhouette on roadside
 - [x] Add occasional flicker or instability in cabin lighting
 - [x] Add radio message with dark or cynical tone
+
+## ATMOSPHERE PASS 001 - 2026-05-03
+
+- [x] Warm cabin lighting pass
+- [x] Cold outside fog and heavier snow pass
+- [x] Dashboard glow pass
+- [x] Windshield frost, grime, and snow pass
+- [x] Radio crackle and disturbing 10-second opening message
+- [x] Distant lights reveal during opening minute
+- [x] One-shot cabin light flicker during opening minute
+- [x] Delay regular road event loop until after opening beats
+- [x] Add extra lived-in cabin paperwork and mess
+- [x] DESIGN updated for Atmosphere Pass 001
