@@ -1,245 +1,137 @@
-# Frozen Highway Cabin Game - Design Document
+# Frozen Highway Cabin - Design
 
-## Working Title
+## CORE IDEA
 
-Frozen Highway Cabin
-
-## One-line Pitch
-
-A first-person atmospheric truck-cabin game where the player drives through a frozen dystopian highway while managing warmth, fuel, radio signals, and the fragile comfort of the cabin.
-
-## Core Fantasy
-
-You are inside a warm, dirty truck cabin.
+You are inside a truck.
 
 Outside is frozen hell.
 
-The truck is not just a vehicle.  
-It is home.
+Inside is warmth.
 
-## Inspiration
+---
 
-The game is inspired by gritty European sci-fi trucker comics and frozen post-apocalyptic road fiction.
+## PLAYER EXPERIENCE
 
-Important: the game should not copy existing characters, names, stories, logos, or exact designs.
-
-We only want the mood:
-- huge roads
-- lone trucker
-- brutal cold
-- strange encounters
-- rough humor
-- dirty machinery
-- warmth inside danger
-
-## Perspective
-
-First-person 3D.
-
-The player sits in the driver seat.
-
-The player can:
+- sit in cabin
 - look around
-- interact with cabin objects
-- watch the road through the windshield
-- listen to radio transmissions
-- manage simple truck systems
+- move slightly inside the cabin
+- interact with systems
+- feel atmosphere
 
-The player does not leave the truck in the MVP.
+---
 
-## Emotional Pillars
+## PERSPECTIVE
 
-### 1. Cozy Isolation
+First-person
 
-The cabin should feel warm, personal, and safe.
+Driver-focused
 
-The world outside should feel hostile and huge.
+Player is no longer fixed to a single point.
 
-### 2. Slow Tension
+---
 
-The game should have danger, but not constant panic.
+## CABIN MOVEMENT (PHASE 1)
 
-The player should feel pressure from the environment, not from twitch combat.
+The player can perform micro-movement inside the cabin:
 
-### 3. Road Hypnosis
+- small left/right movement
+- small forward/back movement
+- leaning left/right
 
-The road, snow, engine noise, and radio static should create a hypnotic mood.
+The player is still constrained to the driver area.
 
-### 4. Lived-in Machine
+No full walking is allowed.
 
-The truck should feel old, patched, personal, and heavily used.
+Purpose:
+- increase physical presence
+- improve interaction feel
+- allow reaching objects naturally
 
-## MVP Scope
+Constraints:
+- small movement radius
+- no collision system yet
+- interaction uses camera raycast
+- existing systems must remain intact
 
-The MVP is a vertical slice, not a full game.
+---
 
-The player should be able to:
-- sit in the cabin
-- look around
-- see the endless frozen road
-- toggle radio
-- toggle heater
-- toggle cabin lights
-- watch basic gauges
-- experience random events
+## SYSTEMS
 
-## MVP Systems
-
-### TruckController
-
-Responsible for:
-- driving state
+### Truck
 - speed
-- fuel drain
-- engine condition
-- forwarding state to UI/gauges
-
-### CabinInteractionSystem
-
-Responsible for:
-- detecting interactable objects
-- showing simple interaction hints
-- calling object actions
-
-Interactable objects:
-- radio
-- heater
-- light switch
-
-### RoadGenerator
-
-Responsible for:
-- endless road illusion
-- moving road segments
-- spawning simple roadside props
-- maintaining frozen highway atmosphere
-
-### EventManager
-
-Responsible for:
-- triggering random road events
-- timing events
-- avoiding too many events too quickly
-
-Initial events:
-- radio distress signal
-- snowstorm
-- suspicious headlights behind the truck
-- abandoned vehicle on road
-
-### RadioSystem
-
-Responsible for:
-- radio on/off state
-- static messages
-- event-based transmissions
-- atmospheric text/audio placeholders
-
-### ResourceState
-
-Responsible for:
 - fuel
-- cabin heat
 - engine condition
 
-Resources should change slowly.
-
-The goal is mood, not hardcore survival.
-
-## Visual Direction
-
-### Inside Cabin
-
-Warm palette:
-- amber dashboard lights
-- dirty orange glow
-- old plastic
-- worn metal
-- scratched glass
-- soft cabin light
-
-Objects:
-- steering wheel
-- dashboard
-- gauges
+### Cabin
+- heater
+- lights
 - radio
-- heater controls
-- cup/can
-- hanging charm
-- old photo
-- sleeping blanket or jacket
 
-### Outside
+---
 
-Cold palette:
-- blue
-- grey
-- white
-- black silhouettes
+## EVENTS
 
-Environment:
-- snow
-- fog
-- empty highway
-- road signs
-- abandoned vehicles
-- distant towers
-- occasional lights
+- radio signal
+- storm
+- headlights behind
+- abandoned vehicle
 
-## Audio Direction
+---
 
-Use placeholders if real audio is not available.
+## EMOTION
 
-Suggested layers:
-- engine rumble
-- wind outside
-- snowstorm intensity
-- cabin hum
-- radio static
-- distorted voice transmissions
-- button clicks
+- loneliness
+- calm
+- subtle tension
+- warmth vs cold
 
-Current placeholder implementation:
-- procedural engine rumble that follows truck speed
-- procedural wind hiss that grows during storm events
-- procedural radio static that follows the radio power state
+---
 
-## Controls
+## VISUAL
 
-Suggested controls:
+Inside:
+- warm
+- dirty
+- lived-in
 
-- Mouse: look around
-- W/S: increase/decrease speed or throttle
-- E: interact
-- R: toggle radio
-- H: toggle heater
-- L: toggle cabin lights
-- Esc: release mouse / pause
+Outside:
+- cold
+- empty
+- foggy
 
-## UI Direction
+---
 
-Prefer diegetic UI.
+## MVP
 
-This means:
-- fuel displayed as dashboard gauge
-- heat displayed as dashboard gauge
-- engine condition as warning light
+Playable scene:
+- sitting in cabin
+- moving road
+- interaction
+- events
 
-Avoid big floating HUD unless needed for debugging.
+---
 
-Debug HUD is acceptable in MVP.
+## NON-GOALS
 
-## First Playable Moment
+- no combat
+- no inventory
+- no full walking yet
 
-The first playable moment should be:
+---
 
-The player starts seated in the cabin.
+## FUTURE
+
+- seat switching
+- closer interaction zones
+- possible full walking later
+
+---
+
+## Atmosphere Pass 001 - Opening Minute
 
 The engine is already running.
 
 Snow hits the windshield.
-
-## Atmosphere Pass 001 - Opening Minute
 
 The first 60 seconds should now play as a small cinematic loop while preserving player control:
 
@@ -263,13 +155,13 @@ The road moves forward.
 
 The radio crackles.
 
-The player turns the heater on.
-
 A weak transmission appears:
 
-“...anyone on Route 9... do not stop near the black lights...”
+"...anyone on Route 9... do not stop near the black lights..."
 
 That is enough.
+
+---
 
 ## Future Roadmap
 

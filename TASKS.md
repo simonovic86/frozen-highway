@@ -40,6 +40,14 @@
 ## UI
 - [x] gauges
 
+## MOVEMENT UPGRADE
+
+- [x] Add micro-movement inside cabin (left/right/forward/back)
+- [x] Clamp movement to driver area
+- [x] Add leaning (left/right)
+- [x] Preserve existing interaction system
+- [x] Update controls in README
+
 ## DOCS
 - [x] README
 - [x] DESIGN
