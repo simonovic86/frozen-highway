@@ -4,9 +4,14 @@ extends Node
 signal changed(fuel, cabin_heat, engine_condition)
 signal toggles_changed(heater_on, cabin_lights_on)
 
+const HEATER_OFF := 0
+const HEATER_LOW := 1
+const HEATER_HIGH := 2
+
 var fuel := 100.0
 var cabin_heat := 60.0
 var engine_condition := 96.0
+var heater_level := HEATER_OFF
 var heater_on := false
 var cabin_lights_on := true
 var storm_intensity := 0.0
@@ -17,13 +22,22 @@ func update_drive(delta: float, speed: float) -> void:
 		return
 
 	var drain := 0.018 + speed * 0.0012
-	if heater_on:
-		drain += 0.006
+	if heater_level == HEATER_LOW:
+		drain += 0.003
+	elif heater_level == HEATER_HIGH:
+		drain += 0.008
 	fuel = maxf(0.0, fuel - drain * delta)
 
 	var outside_pressure := lerpf(42.0, 25.0, storm_intensity)
-	var heat_target := 82.0 if heater_on else outside_pressure
-	cabin_heat = move_toward(cabin_heat, heat_target, delta * (3.6 if heater_on else 1.7))
+	var heat_target := outside_pressure
+	var heat_rate := 1.7
+	if heater_level == HEATER_LOW:
+		heat_target = 70.0
+		heat_rate = 2.5
+	elif heater_level == HEATER_HIGH:
+		heat_target = 86.0
+		heat_rate = 4.2
+	cabin_heat = move_toward(cabin_heat, heat_target, delta * heat_rate)
 
 	var wear := (0.0018 + storm_intensity * 0.0025) * delta
 	engine_condition = maxf(0.0, engine_condition - wear)
@@ -31,10 +45,17 @@ func update_drive(delta: float, speed: float) -> void:
 	changed.emit(fuel, cabin_heat, engine_condition)
 
 func toggle_heater() -> void:
-	set_heater_on(not heater_on)
+	cycle_heater_level()
 
 func set_heater_on(enabled: bool) -> void:
-	heater_on = enabled
+	set_heater_level(HEATER_LOW if enabled else HEATER_OFF)
+
+func cycle_heater_level() -> void:
+	set_heater_level((heater_level + 1) % 3)
+
+func set_heater_level(level: int) -> void:
+	heater_level = clampi(level, HEATER_OFF, HEATER_HIGH)
+	heater_on = heater_level > HEATER_OFF
 	toggles_changed.emit(heater_on, cabin_lights_on)
 
 func toggle_cabin_lights() -> void:

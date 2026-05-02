@@ -109,3 +109,12 @@
 - [x] Require player to lean/reposition for radio and heater
 - [x] Keep E as interact
 - [x] Update README controls/testing notes
+
+## OBJECT ACTION PASS
+
+- [x] Add hold-to-interact for heater/radio
+- [x] Add simple button/lever visual feedback
+- [x] Add radio tuning action with 2-3 stations/messages
+- [x] Add heater level: off / low / high
+- [x] Add one non-critical inspectable object: photo or note
+- [x] Update README testing notes
