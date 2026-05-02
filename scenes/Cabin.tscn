@@ -1,0 +1,19 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/Cabin.gd" id="1_cabin"]
+[ext_resource type="Script" path="res://scripts/CabinInteractionSystem.gd" id="2_interaction"]
+
+[node name="Cabin" type="Node3D"]
+script = ExtResource("1_cabin")
+
+[node name="CameraPivot" type="Node3D" parent="."]
+position = Vector3(0, 1.15, 2.35)
+
+[node name="Camera3D" type="Camera3D" parent="CameraPivot"]
+current = true
+fov = 68.0
+
+[node name="InteractionRay" type="RayCast3D" parent="CameraPivot/Camera3D"]
+target_position = Vector3(0, 0, -3.2)
+enabled = true
+script = ExtResource("2_interaction")

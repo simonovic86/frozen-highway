@@ -1,0 +1,14 @@
+[gd_scene load_steps=4 format=3]
+
+[ext_resource type="Script" path="res://scripts/Main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://scenes/Road.tscn" id="2_road"]
+[ext_resource type="PackedScene" path="res://scenes/Cabin.tscn" id="3_cabin"]
+
+[node name="Main" type="Node3D"]
+script = ExtResource("1_main")
+
+[node name="Road" parent="." instance=ExtResource("2_road")]
+
+[node name="Cabin" parent="." instance=ExtResource("3_cabin")]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
