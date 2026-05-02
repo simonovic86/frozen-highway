@@ -42,11 +42,11 @@
 
 ## MOVEMENT UPGRADE
 
-- [ ] Add micro-movement inside cabin (left/right/forward/back)
-- [ ] Clamp movement to driver area
-- [ ] Add leaning (left/right)
-- [ ] Preserve existing interaction system
-- [ ] Update controls in README
+- [x] Add micro-movement inside cabin (left/right/forward/back)
+- [x] Clamp movement to driver area
+- [x] Add leaning (left/right)
+- [x] Preserve existing interaction system
+- [x] Update controls in README
 
 ## DOCS
 - [x] README

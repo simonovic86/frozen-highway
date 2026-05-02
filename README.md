@@ -37,6 +37,7 @@ Esc - pause
 ## CURRENT FEATURES
 
 - first-person cabin
+- constrained cabin micro-movement and leaning
 - moving road
 - cabin interactions
 - fuel/heat system
@@ -73,6 +74,5 @@ Frozen world outside.
 
 ## NEXT
 
-- movement upgrade (in progress)
 - better interaction feel
 - more atmosphere

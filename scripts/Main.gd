@@ -122,6 +122,11 @@ func _ensure_input_actions() -> void:
 	_add_key_action("lights_toggle", KEY_L)
 	_add_key_action("throttle_up", KEY_W)
 	_add_key_action("throttle_down", KEY_S)
+	_add_key_action("cabin_move_left", KEY_A)
+	_add_key_action("cabin_move_right", KEY_D)
+	_add_key_action("cabin_move_modifier", KEY_SHIFT)
+	_add_key_action("cabin_lean_left", KEY_Z)
+	_add_key_action("cabin_lean_right", KEY_C)
 	_add_key_action("release_mouse", KEY_ESCAPE)
 
 func _add_key_action(action_name: String, keycode: Key) -> void:

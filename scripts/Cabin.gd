@@ -15,6 +15,16 @@ var event_manager: Node
 var yaw := 0.0
 var pitch := 0.0
 var mouse_sensitivity := 0.0024
+var movement_offset := Vector3.ZERO
+var target_movement_offset := Vector3.ZERO
+var lean_amount := 0.0
+var target_lean_amount := 0.0
+var movement_speed := 0.85
+var movement_limit_x := 0.42
+var movement_limit_z := 0.34
+var lean_angle := deg_to_rad(7.0)
+var lean_offset_x := 0.14
+var lean_speed := 8.5
 var current_speed := 20.0
 var motion_time := 0.0
 var storm_visual_intensity := 0.0
@@ -87,6 +97,7 @@ func setup(new_resource_state: Node, new_radio_system: Node, new_truck_controlle
 
 func _process(delta: float) -> void:
 	motion_time += delta
+	_update_player_movement(delta)
 	_update_cabin_motion()
 	_update_wipers()
 	_update_light_flicker(delta)
@@ -95,7 +106,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
 		yaw -= event.relative.x * mouse_sensitivity
 		pitch = clampf(pitch - event.relative.y * mouse_sensitivity, deg_to_rad(-34.0), deg_to_rad(28.0))
-		camera_pivot.rotation = Vector3(pitch, yaw, 0.0)
+		_apply_camera_rotation()
 
 func set_windshield_snow(enabled: bool) -> void:
 	storm_visual_intensity = 1.0 if enabled else 0.0
@@ -145,18 +156,43 @@ func _on_speed_changed(speed: float) -> void:
 	if speed_label != null:
 		speed_label.text = "%02d KM/H" % int(speed)
 
+func _update_player_movement(delta: float) -> void:
+	var input_vector := Vector2.ZERO
+	input_vector.x = Input.get_axis("cabin_move_left", "cabin_move_right")
+	if Input.is_action_pressed("cabin_move_modifier"):
+		input_vector.y = Input.get_axis("throttle_up", "throttle_down")
+
+	if input_vector.length() > 1.0:
+		input_vector = input_vector.normalized()
+
+	target_movement_offset.x += input_vector.x * movement_speed * delta
+	target_movement_offset.z += input_vector.y * movement_speed * delta
+	target_movement_offset.x = clampf(target_movement_offset.x, -movement_limit_x, movement_limit_x)
+	target_movement_offset.z = clampf(target_movement_offset.z, -movement_limit_z, movement_limit_z)
+
+	movement_offset = movement_offset.lerp(target_movement_offset, 1.0 - exp(-10.0 * delta))
+
+	target_lean_amount = Input.get_axis("cabin_lean_left", "cabin_lean_right")
+	lean_amount = lerpf(lean_amount, target_lean_amount, 1.0 - exp(-lean_speed * delta))
+	_apply_camera_rotation()
+
 func _update_cabin_motion() -> void:
 	var speed_factor := clampf(current_speed / 32.0, 0.0, 1.0)
 	var storm_factor := storm_visual_intensity
 	var shake_strength := 0.006 + speed_factor * 0.012 + storm_factor * 0.012
-	camera_pivot.position = base_camera_pivot_position + Vector3(
+	var cabin_shake := Vector3(
 		sin(motion_time * 7.7) * shake_strength * 0.55,
 		sin(motion_time * 11.2) * shake_strength,
 		0.0
 	)
+	var lean_offset := Vector3(lean_amount * lean_offset_x, 0.0, 0.0)
+	camera_pivot.position = base_camera_pivot_position + movement_offset + lean_offset + cabin_shake
 
 	if hanging_charm != null:
 		hanging_charm.rotation.z = sin(motion_time * 2.6) * (0.12 + storm_factor * 0.12)
+
+func _apply_camera_rotation() -> void:
+	camera_pivot.rotation = Vector3(pitch, yaw, -lean_amount * lean_angle)
 
 func _update_wipers() -> void:
 	if left_wiper == null or right_wiper == null:

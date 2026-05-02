@@ -10,9 +10,10 @@ var min_speed := 8.0
 var max_speed := 32.0
 
 func _process(delta: float) -> void:
-	if Input.is_action_pressed("throttle_up"):
+	var cabin_movement_mode := Input.is_action_pressed("cabin_move_modifier")
+	if not cabin_movement_mode and Input.is_action_pressed("throttle_up"):
 		target_speed = minf(max_speed, target_speed + 12.0 * delta)
-	if Input.is_action_pressed("throttle_down"):
+	if not cabin_movement_mode and Input.is_action_pressed("throttle_down"):
 		target_speed = maxf(min_speed, target_speed - 12.0 * delta)
 	if resource_state != null and resource_state.fuel <= 0.0:
 		target_speed = 0.0
