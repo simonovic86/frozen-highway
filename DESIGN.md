@@ -199,6 +199,11 @@ Suggested layers:
 - distorted voice transmissions
 - button clicks
 
+Current placeholder implementation:
+- procedural engine rumble that follows truck speed
+- procedural wind hiss that grows during storm events
+- procedural radio static that follows the radio power state
+
 ## Controls
 
 Suggested controls:

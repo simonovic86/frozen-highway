@@ -61,3 +61,7 @@
 - [x] launch Godot 4.6 project
 - [x] confirm main scene starts
 - [x] confirm no startup runtime errors
+
+## NEXT PASS - 2026-05-03
+- [x] Esc pause overlay
+- [x] procedural cabin audio placeholders

@@ -29,6 +29,8 @@ Implemented:
 - diegetic dashboard gauges
 - timed events: radio distress signal, snowstorm, suspicious headlights, abandoned vehicle
 - atmospheric cabin motion, swinging charm, and storm wipers
+- Esc pause overlay
+- procedural placeholder audio for engine rumble, wind, and radio static
 
 ## Engine
 
@@ -44,7 +46,7 @@ Language: GDScript
 - R: toggle radio
 - H: toggle heater
 - L: toggle cabin lights
-- Esc: release/capture mouse
+- Esc: pause/resume and release/capture mouse
 
 ## How to Run
 
@@ -83,3 +85,4 @@ scripts/ResourceState.gd
 4. Look down at the radio, heater, or overhead light switch and press E, or use R/H/L shortcuts.
 5. Watch the gauges move over time as fuel drains, heat changes, and engine condition slowly wears.
 6. Wait for timed events: a radio distress message, a snowstorm windshield overlay with wipers, suspicious headlights, and an abandoned vehicle.
+7. Press Esc and confirm the pause overlay appears, the mouse is released, and Esc resumes the drive.
