@@ -118,3 +118,19 @@
 - [x] Add heater level: off / low / high
 - [x] Add one non-critical inspectable object: photo or note
 - [x] Update README testing notes
+
+## PRESSURE + CONSEQUENCE PASS
+
+- [x] Add fuel drain over time (already exists → tune it)
+- [x] Add low fuel threshold (e.g. < 20%)
+- [x] When fuel is low:
+  - dashboard warning changes (color, blinking)
+  - cabin light slightly unstable
+- [x] Add engine condition decay when pushing speed
+- [x] Add visual feedback when engine is bad:
+  - stronger shake
+  - slight camera jitter
+- [x] Add “almost failure” state:
+  - engine struggles (no full stop yet)
+- [x] Add recovery possibility:
+  - slowing down improves engine
