@@ -3,6 +3,7 @@ extends Node3D
 const CabinInteractableScript := preload("res://scripts/CabinInteractable.gd")
 const CLOSE_INTERACTION_DISTANCE := 3.45
 const EASY_INTERACTION_DISTANCE := 3.55
+const HOLD_INTERACTION_DURATION := 0.5
 
 @onready var camera_pivot := $CameraPivot
 @onready var camera := $CameraPivot/Camera3D
@@ -43,13 +44,20 @@ var heat_needle: Node3D
 var engine_needle: Node3D
 var warning_light: MeshInstance3D
 var heater_glow: MeshInstance3D
+var heater_lever: Node3D
+var heater_level_label: Label3D
 var radio_glow: MeshInstance3D
+var radio_button: MeshInstance3D
 var windshield_snow: MeshInstance3D
 var cabin_light: OmniLight3D
 var dash_light: OmniLight3D
 var hanging_charm: MeshInstance3D
 var left_wiper: Node3D
 var right_wiper: Node3D
+var inspect_label: Label
+var inspect_timer := 0.0
+var radio_feedback_timer := 0.0
+var heater_feedback_timer := 0.0
 
 var mat_warm: StandardMaterial3D
 var mat_warm_dark: StandardMaterial3D
@@ -105,6 +113,8 @@ func _process(delta: float) -> void:
 	_update_cabin_motion()
 	_update_wipers()
 	_update_light_flicker(delta)
+	_update_interaction_feedback(delta)
+	_update_inspect_label(delta)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
@@ -126,13 +136,17 @@ func _on_interactable(action_id: String) -> void:
 	match action_id:
 		"radio":
 			if radio_system != null:
-				radio_system.toggle_radio()
+				radio_system.tune_next_station()
+				_trigger_radio_feedback()
 		"heater":
 			if resource_state != null:
-				resource_state.toggle_heater()
+				resource_state.cycle_heater_level()
+				_trigger_heater_feedback()
 		"lights":
 			if resource_state != null:
 				resource_state.toggle_cabin_lights()
+		"inspect_photo":
+			_show_inspect_text("The photo is sun-bleached except for one face scratched out.")
 
 func _on_focus_text_changed(text: String) -> void:
 	hint_label.text = text
@@ -146,17 +160,21 @@ func _on_resources_changed(fuel: float, cabin_heat: float, engine_condition: flo
 
 func _on_toggles_changed(heater_on: bool, cabin_lights_on: bool) -> void:
 	cabin_lights_enabled = cabin_lights_on
-	if heater_glow != null:
-		heater_glow.material_override = mat_red if heater_on else mat_dark
+	var heater_level := 1 if heater_on else 0
+	if resource_state != null:
+		heater_level = resource_state.heater_level
+	_apply_heater_visuals(heater_level)
 	_apply_light_levels(1.0)
 
 func _on_radio_state_changed(is_on: bool) -> void:
-	if radio_glow != null:
-		radio_glow.material_override = mat_green if is_on else mat_dark
+	_apply_radio_visuals(is_on)
 
 func _on_radio_message_changed(text: String) -> void:
 	if radio_screen != null:
-		radio_screen.text = "RADIO\n" + ("SIGNAL" if text != "" else "OFF")
+		var station_text := "SIGNAL"
+		if radio_system != null and radio_system.has_method("get_station_name"):
+			station_text = radio_system.get_station_name()
+		radio_screen.text = "RADIO\n" + (station_text if text != "" else "OFF")
 	if radio_label != null:
 		radio_label.text = text
 
@@ -238,6 +256,71 @@ func _apply_light_levels(flicker: float) -> void:
 		cabin_light.light_energy = cabin_base * flicker
 	if dash_light != null:
 		dash_light.light_energy = dash_base * lerpf(0.82, 1.0, flicker)
+
+func _update_interaction_feedback(delta: float) -> void:
+	if radio_feedback_timer > 0.0:
+		radio_feedback_timer = maxf(0.0, radio_feedback_timer - delta)
+		var lit := int(radio_feedback_timer * 26.0) % 2 == 0
+		if radio_glow != null:
+			radio_glow.material_override = mat_green if lit else mat_dark
+		if radio_button != null:
+			radio_button.material_override = mat_green if lit else mat_dark
+		if radio_feedback_timer <= 0.0:
+			_apply_radio_visuals(radio_system == null or radio_system.is_on)
+
+	if heater_feedback_timer > 0.0:
+		heater_feedback_timer = maxf(0.0, heater_feedback_timer - delta)
+		var lit := int(heater_feedback_timer * 22.0) % 2 == 0
+		if heater_glow != null:
+			heater_glow.material_override = mat_red if lit else mat_dark
+		if heater_feedback_timer <= 0.0:
+			var heater_level := 0
+			if resource_state != null:
+				heater_level = resource_state.heater_level
+			_apply_heater_visuals(heater_level)
+
+func _update_inspect_label(delta: float) -> void:
+	if inspect_timer <= 0.0:
+		return
+	inspect_timer = maxf(0.0, inspect_timer - delta)
+	if inspect_label != null and inspect_timer <= 0.0:
+		inspect_label.text = ""
+
+func _trigger_radio_feedback() -> void:
+	radio_feedback_timer = 0.42
+
+func _trigger_heater_feedback() -> void:
+	heater_feedback_timer = 0.38
+
+func _show_inspect_text(text: String) -> void:
+	inspect_timer = 4.0
+	if inspect_label != null:
+		inspect_label.text = text
+
+func _apply_radio_visuals(is_on: bool) -> void:
+	if radio_glow != null:
+		radio_glow.material_override = mat_green if is_on else mat_dark
+	if radio_button != null:
+		radio_button.material_override = mat_green if is_on else mat_dark
+
+func _apply_heater_visuals(level: int) -> void:
+	if heater_glow != null:
+		if level == 2:
+			heater_glow.material_override = mat_red
+		elif level == 1:
+			heater_glow.material_override = mat_warm_emissive
+		else:
+			heater_glow.material_override = mat_dark
+	if heater_lever != null:
+		heater_lever.rotation_degrees.z = lerpf(-24.0, 24.0, float(level) / 2.0)
+	if heater_level_label != null:
+		match level:
+			0:
+				heater_level_label.text = "OFF"
+			1:
+				heater_level_label.text = "LOW"
+			2:
+				heater_level_label.text = "HIGH"
 
 func _apply_windshield_snow_alpha() -> void:
 	if mat_windshield_snow == null:
@@ -325,13 +408,21 @@ func _build_dashboard() -> void:
 	speed_label = _add_label3d(self, "SpeedLabel", "20 KM/H", Vector3(0.0, 0.02, -0.76), 34, Color(1.0, 0.58, 0.18))
 	_add_box(self, "SpeedGlowBacking", Vector3(1.35, 0.05, 0.03), Vector3(0.0, 0.02, -0.785), mat_warm_emissive)
 
-	var radio := _add_interactable("Radio", "radio", "Toggle radio", Vector3(2.25, -0.22, -0.78), Vector3(0.95, 0.46, 0.22), mat_black, CLOSE_INTERACTION_DISTANCE)
-	radio_glow = _add_box(radio, "RadioGlow", Vector3(0.7, 0.08, 0.025), Vector3(0.0, 0.12, -0.13), mat_green)
-	radio_screen = _add_label3d(radio, "RadioScreen", "RADIO", Vector3(0.0, 0.03, -0.145), 20, Color(0.4, 1.0, 0.55))
+	var radio := _add_interactable("Radio", "radio", "Tune radio", Vector3(2.25, -0.22, -0.78), Vector3(0.95, 0.46, 0.22), mat_black, CLOSE_INTERACTION_DISTANCE, HOLD_INTERACTION_DURATION)
+	radio_glow = _add_box(radio, "RadioGlow", Vector3(0.7, 0.08, 0.025), Vector3(0.0, 0.12, 0.13), mat_green)
+	radio_button = _add_box(radio, "RadioButton", Vector3(0.16, 0.16, 0.04), Vector3(0.34, -0.12, 0.13), mat_green)
+	radio_screen = _add_label3d(radio, "RadioScreen", "RADIO", Vector3(0.0, 0.03, 0.145), 20, Color(0.4, 1.0, 0.55))
 
-	var heater := _add_interactable("Heater", "heater", "Toggle heater", Vector3(-2.25, -0.2, -0.78), Vector3(0.75, 0.42, 0.22), mat_black, CLOSE_INTERACTION_DISTANCE)
-	heater_glow = _add_box(heater, "HeaterGlow", Vector3(0.38, 0.1, 0.025), Vector3(0.0, 0.08, -0.13), mat_dark)
-	_add_label3d(heater, "HeaterText", "HEAT", Vector3(0.0, -0.04, -0.145), 24, Color(1.0, 0.55, 0.2))
+	var heater := _add_interactable("Heater", "heater", "Cycle heater", Vector3(-2.25, -0.2, -0.78), Vector3(0.75, 0.42, 0.22), mat_black, CLOSE_INTERACTION_DISTANCE, HOLD_INTERACTION_DURATION)
+	heater_glow = _add_box(heater, "HeaterGlow", Vector3(0.38, 0.1, 0.025), Vector3(0.0, 0.08, 0.13), mat_dark)
+	_add_label3d(heater, "HeaterText", "HEAT", Vector3(0.0, -0.04, 0.145), 24, Color(1.0, 0.55, 0.2))
+	heater_level_label = _add_label3d(heater, "HeaterLevel", "OFF", Vector3(0.0, -0.16, 0.145), 15, Color(1.0, 0.55, 0.2))
+	heater_lever = Node3D.new()
+	heater_lever.name = "HeaterLever"
+	heater_lever.position = Vector3(0.26, 0.0, 0.145)
+	heater.add_child(heater_lever)
+	_add_box(heater_lever, "LeverStem", Vector3(0.055, 0.28, 0.04), Vector3(0.0, 0.0, 0.0), mat_metal)
+	_add_box(heater_lever, "LeverKnob", Vector3(0.12, 0.12, 0.055), Vector3(0.0, 0.15, -0.005), mat_red)
 	_add_box(self, "FootwellHeaterBleed", Vector3(1.25, 0.05, 0.5), Vector3(-2.18, -0.83, -0.05), mat_warm_emissive)
 
 	_add_interactable("LightSwitch", "lights", "Toggle cabin lights", Vector3(2.72, 1.95, 0.75), Vector3(0.28, 0.34, 0.18), mat_warm, EASY_INTERACTION_DISTANCE)
@@ -379,8 +470,8 @@ func _build_personal_objects() -> void:
 	var blanket := _add_box(self, "Blanket", Vector3(1.4, 0.18, 1.0), Vector3(-2.1, -0.86, 3.6), mat_cloth)
 	blanket.rotation_degrees.y = -6.0
 	_add_box(self, "BlanketFold", Vector3(1.15, 0.16, 0.28), Vector3(-2.22, -0.7, 3.18), mat_warm)
-	_add_box(self, "OldPhoto", Vector3(0.55, 0.36, 0.04), Vector3(-1.95, 0.55, -0.76), mat_blue)
-	_add_box(self, "PhotoBorder", Vector3(0.65, 0.45, 0.025), Vector3(-1.95, 0.55, -0.79), mat_paper)
+	var old_photo := _add_interactable("OldPhoto", "inspect_photo", "Inspect photo", Vector3(-1.95, 0.55, -0.78), Vector3(0.68, 0.48, 0.06), mat_paper, EASY_INTERACTION_DISTANCE)
+	_add_box(old_photo, "PhotoImage", Vector3(0.55, 0.36, 0.035), Vector3(0.0, 0.0, 0.04), mat_blue)
 	var tin_cup := _add_box(self, "TinCup", Vector3(0.28, 0.34, 0.28), Vector3(1.9, -0.64, -0.35), mat_metal)
 	tin_cup.rotation_degrees.z = 7.0
 	_add_box(self, "Thermos", Vector3(0.24, 0.58, 0.24), Vector3(2.55, -0.54, 0.18), mat_blue)
@@ -520,10 +611,22 @@ func _build_overlay() -> void:
 	radio_label.modulate = Color(0.6, 1.0, 0.7)
 	layer.add_child(radio_label)
 
-func _add_interactable(name: String, action_id: String, label: String, position: Vector3, size: Vector3, material: Material, max_interaction_distance: float = 3.0) -> StaticBody3D:
+	inspect_label = Label.new()
+	inspect_label.name = "InspectLabel"
+	inspect_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	inspect_label.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	inspect_label.anchor_left = 0.18
+	inspect_label.anchor_right = 0.82
+	inspect_label.anchor_top = 0.72
+	inspect_label.anchor_bottom = 0.8
+	inspect_label.add_theme_font_size_override("font_size", 22)
+	inspect_label.modulate = Color(1.0, 0.86, 0.62)
+	layer.add_child(inspect_label)
+
+func _add_interactable(name: String, action_id: String, label: String, position: Vector3, size: Vector3, material: Material, max_interaction_distance: float = 3.0, hold_duration: float = 0.0) -> StaticBody3D:
 	var body: StaticBody3D = CabinInteractableScript.new()
 	body.name = name
-	body.setup(action_id, label, max_interaction_distance)
+	body.setup(action_id, label, max_interaction_distance, hold_duration)
 	body.position = position
 	body.interacted.connect(_on_interactable)
 	add_child(body)

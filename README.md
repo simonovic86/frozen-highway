@@ -21,13 +21,14 @@ Godot 4
 
 ## CONTROLS
 
-Mouse - look  
-W/S - speed  
-A/D - move left/right in cabin  
-Shift+W / Shift+S - move forward/back in cabin  
-Z/C - lean left/right  
-E - interact  
-Esc - pause  
+- Mouse - look
+- W/S - speed
+- A/D - move left/right in cabin
+- Shift+W / Shift+S - move forward/back in cabin
+- Z/C - lean left/right
+- E - interact / inspect
+- Hold E - tune radio or cycle heater when prompted
+- Esc - pause
 
 Interaction reach is physical. If the reticle is on a dashboard object but the player is too far away, the hint shows `Move closer`. Use cabin movement and lean to reach the radio and heater; the light switch is easier to reach.
 
@@ -48,7 +49,10 @@ Interaction reach is physical. If the reticle is on a dashboard object but the p
 ## TESTING NOTES
 
 - Look at the radio or heater from the default seated position and confirm the hint can show `Move closer`.
-- Use A/D, Shift+W, and Z/C to move or lean closer, then press E to toggle the radio or heater.
+- Use A/D, Shift+W, and Z/C to move or lean closer, then hold E for about half a second on the radio and heater.
+- Confirm the radio cycles through `WEATHER`, `COMPANY`, and `EMERGENCY` messages and the radio button/glow flickers after tuning.
+- Confirm the heater cycles `OFF`, `LOW`, and `HIGH`; the heat gauge should trend differently by level, and the heater lever/glow should change.
+- Look at the old dashboard photo and press E to show its short inspect line.
 - Confirm the light switch can still be toggled with E from an easier reach position.
 
 ---
