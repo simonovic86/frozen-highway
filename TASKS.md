@@ -43,3 +43,10 @@
 ## DOCS
 - [x] README
 - [x] DESIGN
+
+## VALIDATION
+- [x] Godot 4.6 metadata updated
+- [x] headless runtime check
+- [x] visual smoke test
+- [x] basic gameplay smoke test
+- [x] cabin visual polish after test
