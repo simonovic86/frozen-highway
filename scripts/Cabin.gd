@@ -17,9 +17,9 @@ var pitch := 0.0
 var mouse_sensitivity := 0.0024
 var current_speed := 20.0
 var motion_time := 0.0
-var storm_visual_intensity := 0.0
+var storm_visual_intensity := 0.28
 var cabin_lights_enabled := true
-var next_light_flicker_time := 3.2
+var next_light_flicker_time := 72.0
 var light_flicker_time := 0.0
 
 var hint_label: Label
@@ -50,6 +50,8 @@ var mat_green: StandardMaterial3D
 var mat_blue: StandardMaterial3D
 var mat_black: StandardMaterial3D
 var mat_snow: StandardMaterial3D
+var mat_frost: StandardMaterial3D
+var mat_windshield_snow: StandardMaterial3D
 var mat_wiper: StandardMaterial3D
 var mat_grime: StandardMaterial3D
 var mat_rust: StandardMaterial3D
@@ -98,9 +100,14 @@ func _unhandled_input(event: InputEvent) -> void:
 		camera_pivot.rotation = Vector3(pitch, yaw, 0.0)
 
 func set_windshield_snow(enabled: bool) -> void:
-	storm_visual_intensity = 1.0 if enabled else 0.0
+	storm_visual_intensity = 1.0 if enabled else 0.28
 	if windshield_snow != null:
-		windshield_snow.visible = enabled
+		windshield_snow.visible = true
+		_apply_windshield_snow_alpha()
+
+func force_light_flicker(duration: float = 0.36) -> void:
+	light_flicker_time = duration
+	next_light_flicker_time = 56.0
 
 func _on_interactable(action_id: String) -> void:
 	match action_id:
@@ -187,12 +194,20 @@ func _update_light_flicker(delta: float) -> void:
 	_apply_light_levels(flicker)
 
 func _apply_light_levels(flicker: float) -> void:
-	var cabin_base := 4.4 if cabin_lights_enabled else 0.35
-	var dash_base := 2.8 if cabin_lights_enabled else 0.75
+	var cabin_base := 5.4 if cabin_lights_enabled else 0.45
+	var dash_base := 3.65 if cabin_lights_enabled else 1.0
 	if cabin_light != null:
 		cabin_light.light_energy = cabin_base * flicker
 	if dash_light != null:
 		dash_light.light_energy = dash_base * lerpf(0.82, 1.0, flicker)
+
+func _apply_windshield_snow_alpha() -> void:
+	if mat_windshield_snow == null:
+		return
+	var snow_color := mat_windshield_snow.albedo_color
+	snow_color.a = lerpf(0.16, 0.34, storm_visual_intensity)
+	mat_windshield_snow.albedo_color = snow_color
+	mat_windshield_snow.emission_energy_multiplier = lerpf(0.08, 0.22, storm_visual_intensity)
 
 func _set_gauge(needle: Node3D, normalized_value: float) -> void:
 	if needle == null:
@@ -203,7 +218,7 @@ func _set_gauge(needle: Node3D, normalized_value: float) -> void:
 func _create_materials() -> void:
 	mat_warm = _mat(Color(0.5, 0.27, 0.13), Color(0.45, 0.18, 0.04), 0.04)
 	mat_warm_dark = _mat(Color(0.15, 0.095, 0.065), Color(0.36, 0.12, 0.03), 0.08)
-	mat_warm_emissive = _mat(Color(1.0, 0.58, 0.18), Color(1.0, 0.38, 0.08), 1.8)
+	mat_warm_emissive = _mat(Color(1.0, 0.58, 0.18), Color(1.0, 0.38, 0.08), 2.6)
 	mat_dark = _mat(Color(0.048, 0.042, 0.036), Color(0.08, 0.025, 0.01), 0.025)
 	mat_metal = _mat(Color(0.12, 0.115, 0.105), Color.BLACK, 0.0)
 	mat_red = _mat(Color(1.0, 0.12, 0.05), Color(1.0, 0.05, 0.0), 1.7)
@@ -211,6 +226,8 @@ func _create_materials() -> void:
 	mat_blue = _mat(Color(0.32, 0.56, 0.8), Color(0.1, 0.32, 0.55), 0.65)
 	mat_black = _mat(Color(0.015, 0.014, 0.013), Color.BLACK, 0.0)
 	mat_snow = _mat(Color(0.78, 0.86, 0.94), Color(0.18, 0.26, 0.34), 0.15)
+	mat_frost = _transparent_mat(Color(0.78, 0.9, 1.0, 0.32), Color(0.12, 0.22, 0.32), 0.12)
+	mat_windshield_snow = _transparent_mat(Color(0.7, 0.82, 0.94, 0.2), Color(0.12, 0.2, 0.28), 0.12)
 	mat_wiper = _mat(Color(0.02, 0.018, 0.016), Color.BLACK, 0.0)
 	mat_grime = _mat(Color(0.035, 0.03, 0.024), Color.BLACK, 0.0)
 	mat_rust = _mat(Color(0.36, 0.12, 0.045), Color.BLACK, 0.0)
@@ -252,12 +269,15 @@ func _build_cabin() -> void:
 	_add_box(self, "LeftSideWindow", Vector3(0.04, 1.0, 1.4), Vector3(-3.34, 1.15, 0.7), mat_glass)
 	_add_box(self, "RightSideWindow", Vector3(0.04, 1.0, 1.4), Vector3(3.34, 1.15, 0.7), mat_glass)
 
-	windshield_snow = _add_box(self, "WindshieldSnow", Vector3(5.15, 1.2, 0.035), Vector3(0.0, 1.25, -1.82), mat_snow)
-	windshield_snow.visible = false
+	windshield_snow = _add_box(self, "WindshieldSnow", Vector3(5.15, 1.2, 0.035), Vector3(0.0, 1.25, -1.82), mat_windshield_snow)
+	windshield_snow.visible = true
+	_apply_windshield_snow_alpha()
 	_build_wear_marks()
+	_build_windshield_frost()
 	_build_wipers()
 
 func _build_dashboard() -> void:
+	_add_box(self, "DashUnderGlow", Vector3(4.6, 0.05, 0.04), Vector3(0.0, -0.37, -0.65), mat_warm_emissive)
 	_add_box(self, "AmberDashStrip", Vector3(5.4, 0.08, 0.08), Vector3(0.0, 0.25, -0.86), mat_warm_emissive)
 	_build_steering_wheel()
 
@@ -265,6 +285,7 @@ func _build_dashboard() -> void:
 	heat_needle = _build_gauge("HeatGauge", "HEAT", Vector3(0.0, 0.18, -0.82))
 	engine_needle = _build_gauge("EngineGauge", "ENG", Vector3(1.25, 0.18, -0.82))
 	speed_label = _add_label3d(self, "SpeedLabel", "20 KM/H", Vector3(0.0, 0.02, -0.76), 34, Color(1.0, 0.58, 0.18))
+	_add_box(self, "SpeedGlowBacking", Vector3(1.35, 0.05, 0.03), Vector3(0.0, 0.02, -0.785), mat_warm_emissive)
 
 	var radio := _add_interactable("Radio", "radio", "Toggle radio", Vector3(2.25, -0.22, -0.78), Vector3(0.95, 0.46, 0.22), mat_black)
 	radio_glow = _add_box(radio, "RadioGlow", Vector3(0.7, 0.08, 0.025), Vector3(0.0, 0.12, -0.13), mat_green)
@@ -273,6 +294,7 @@ func _build_dashboard() -> void:
 	var heater := _add_interactable("Heater", "heater", "Toggle heater", Vector3(-2.25, -0.2, -0.78), Vector3(0.75, 0.42, 0.22), mat_black)
 	heater_glow = _add_box(heater, "HeaterGlow", Vector3(0.38, 0.1, 0.025), Vector3(0.0, 0.08, -0.13), mat_dark)
 	_add_label3d(heater, "HeaterText", "HEAT", Vector3(0.0, -0.04, -0.145), 24, Color(1.0, 0.55, 0.2))
+	_add_box(self, "FootwellHeaterBleed", Vector3(1.25, 0.05, 0.5), Vector3(-2.18, -0.83, -0.05), mat_warm_emissive)
 
 	_add_interactable("LightSwitch", "lights", "Toggle cabin lights", Vector3(2.72, 1.95, 0.75), Vector3(0.28, 0.34, 0.18), mat_warm)
 	warning_light = _add_box(self, "WarningLight", Vector3(0.18, 0.18, 0.06), Vector3(1.95, 0.18, -0.76), mat_green)
@@ -335,11 +357,13 @@ func _build_personal_objects() -> void:
 	_add_box(self, "MapCrease", Vector3(0.035, 0.025, 0.6), Vector3(0.92, -0.7, 0.9), mat_grime)
 	_add_box(self, "FoodCanA", Vector3(0.22, 0.24, 0.22), Vector3(2.85, -0.76, 1.15), mat_metal)
 	_add_box(self, "FoodCanB", Vector3(0.2, 0.2, 0.2), Vector3(2.55, -0.78, 1.32), mat_rust)
+	_add_box(self, "CoffeeRing", Vector3(0.34, 0.025, 0.34), Vector3(1.82, -0.815, -0.62), mat_grime)
 	_add_box(self, "GloveLeft", Vector3(0.52, 0.12, 0.26), Vector3(-0.72, -0.84, 2.86), mat_warm_dark)
 	var glove_right := _add_box(self, "GloveRight", Vector3(0.5, 0.12, 0.26), Vector3(-0.2, -0.84, 2.98), mat_warm_dark)
 	glove_right.rotation_degrees.y = 16.0
 	_build_story_note()
 	_build_improvised_fix()
+	_build_cab_paperwork()
 	hanging_charm = _add_box(self, "HangingCharm", Vector3(0.12, 0.26, 0.04), Vector3(0.45, 1.82, -1.62), mat_warm_emissive)
 
 func _build_story_note() -> void:
@@ -359,6 +383,30 @@ func _build_improvised_fix() -> void:
 	var wire_b := _add_box(self, "ExposedWireB", Vector3(0.04, 0.5, 0.04), Vector3(2.72, 1.21, -1.71), mat_wire)
 	wire_b.rotation_degrees.z = 22.0
 	_add_box(self, "WireCopperEnd", Vector3(0.06, 0.08, 0.045), Vector3(2.62, 0.98, -1.71), mat_rust)
+
+func _build_cab_paperwork() -> void:
+	var route_stub := _add_box(self, "RouteStub", Vector3(0.48, 0.32, 0.022), Vector3(1.28, 0.42, -0.83), mat_paper)
+	route_stub.rotation_degrees.z = 3.0
+	var route_text := _add_label3d(self, "RouteStubText", "MILE 12\nNO STOP", Vector3(1.28, 0.42, -0.856), 16, Color(0.08, 0.065, 0.05))
+	route_text.rotation_degrees.z = 3.0
+	var hanging_tag := _add_box(self, "HangingDispatchTag", Vector3(0.34, 0.42, 0.022), Vector3(-0.45, 1.55, -1.66), mat_paper)
+	hanging_tag.rotation_degrees.z = -7.0
+	_add_box(self, "DispatchTagString", Vector3(0.025, 0.38, 0.025), Vector3(-0.45, 1.83, -1.66), mat_wire)
+
+func _build_windshield_frost() -> void:
+	_add_box(self, "FrostTopEdge", Vector3(5.05, 0.16, 0.028), Vector3(0.0, 1.94, -1.815), mat_frost)
+	_add_box(self, "FrostLeftEdge", Vector3(0.22, 1.08, 0.028), Vector3(-2.52, 1.25, -1.814), mat_frost)
+	_add_box(self, "FrostRightEdge", Vector3(0.2, 0.95, 0.028), Vector3(2.44, 1.17, -1.814), mat_frost)
+	for i in 12:
+		var side := -1.0 if i % 2 == 0 else 1.0
+		var fleck := _add_box(
+			self,
+			"IceFleck%02d" % i,
+			Vector3(0.08 + float(i % 3) * 0.035, 0.035, 0.026),
+			Vector3(side * (0.72 + float(i % 5) * 0.38), 0.78 + float(i % 4) * 0.24, -1.812),
+			mat_frost
+		)
+		fleck.rotation_degrees.z = -18.0 + float(i) * 7.0
 
 func _build_wear_marks() -> void:
 	var dash_stain := _add_box(self, "DashCoffeeStain", Vector3(0.62, 0.035, 0.34), Vector3(1.72, -0.78, -0.88), mat_grime)
@@ -394,8 +442,8 @@ func _build_wiper(name: String, position: Vector3) -> Node3D:
 func _build_lights() -> void:
 	cabin_light = OmniLight3D.new()
 	cabin_light.name = "CabinWarmLight"
-	cabin_light.light_color = Color(1.0, 0.58, 0.24)
-	cabin_light.light_energy = 4.4
+	cabin_light.light_color = Color(1.0, 0.64, 0.32)
+	cabin_light.light_energy = 5.4
 	cabin_light.omni_range = 6.0
 	cabin_light.position = Vector3(0.0, 2.12, 1.7)
 	add_child(cabin_light)
@@ -403,7 +451,7 @@ func _build_lights() -> void:
 	dash_light = OmniLight3D.new()
 	dash_light.name = "DashAmberLight"
 	dash_light.light_color = Color(1.0, 0.42, 0.1)
-	dash_light.light_energy = 2.8
+	dash_light.light_energy = 3.65
 	dash_light.omni_range = 4.0
 	dash_light.position = Vector3(0.0, 0.3, -0.62)
 	add_child(dash_light)
@@ -480,4 +528,10 @@ func _mat(color: Color, emission: Color, emission_energy: float) -> StandardMate
 		material.emission_enabled = true
 		material.emission = emission
 		material.emission_energy_multiplier = emission_energy
+	return material
+
+func _transparent_mat(color: Color, emission: Color, emission_energy: float) -> StandardMaterial3D:
+	var material := _mat(color, emission, emission_energy)
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.blend_mode = BaseMaterial3D.BLEND_MODE_MIX
 	return material

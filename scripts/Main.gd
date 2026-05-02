@@ -70,17 +70,17 @@ func _setup_environment() -> void:
 	environment.background_mode = Environment.BG_COLOR
 	environment.background_color = Color(0.012, 0.022, 0.038)
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color = Color(0.08, 0.13, 0.18)
-	environment.ambient_light_energy = 0.35
+	environment.ambient_light_color = Color(0.055, 0.105, 0.16)
+	environment.ambient_light_energy = 0.28
 	environment.fog_enabled = true
-	environment.fog_light_color = Color(0.36, 0.48, 0.62)
-	environment.fog_density = 0.045
+	environment.fog_light_color = Color(0.28, 0.4, 0.56)
+	environment.fog_density = 0.062
 	world_environment.environment = environment
 
 	var cold_moon := DirectionalLight3D.new()
 	cold_moon.name = "ColdMoonLight"
-	cold_moon.light_color = Color(0.55, 0.68, 0.9)
-	cold_moon.light_energy = 0.45
+	cold_moon.light_color = Color(0.45, 0.62, 0.88)
+	cold_moon.light_energy = 0.32
 	cold_moon.rotation_degrees = Vector3(-45.0, 20.0, 0.0)
 	add_child(cold_moon)
 

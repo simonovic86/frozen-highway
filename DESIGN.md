@@ -239,6 +239,24 @@ The engine is already running.
 
 Snow hits the windshield.
 
+## Atmosphere Pass 001 - Opening Minute
+
+The first 60 seconds should now play as a small cinematic loop while preserving player control:
+
+- start seated in a warmer amber cabin with the engine already running
+- road and snow motion are visible immediately through a frosted windshield
+- at 10 seconds, the radio crackles and prints a short disturbing transmission
+- at about 14.5 seconds, distant cold lights appear down the road
+- at about 17 seconds, the cabin lights flicker once
+- regular road events are delayed so the opening has time to breathe before the event loop resumes
+
+Visual emphasis for this pass:
+
+- warmer cabin and dashboard glow
+- colder, denser outside fog and snowfall
+- translucent windshield snow, frost edges, grime, and ice flecks
+- additional lived-in paperwork and small cabin mess
+
 The dashboard glows.
 
 The road moves forward.
