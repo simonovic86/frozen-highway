@@ -30,6 +30,7 @@ var cabin_light: OmniLight3D
 var dash_light: OmniLight3D
 
 var mat_warm: StandardMaterial3D
+var mat_warm_dark: StandardMaterial3D
 var mat_warm_emissive: StandardMaterial3D
 var mat_dark: StandardMaterial3D
 var mat_metal: StandardMaterial3D
@@ -102,9 +103,9 @@ func _on_toggles_changed(heater_on: bool, cabin_lights_on: bool) -> void:
 	if heater_glow != null:
 		heater_glow.material_override = mat_red if heater_on else mat_dark
 	if cabin_light != null:
-		cabin_light.light_energy = 2.6 if cabin_lights_on else 0.25
+		cabin_light.light_energy = 4.4 if cabin_lights_on else 0.35
 	if dash_light != null:
-		dash_light.light_energy = 1.6 if cabin_lights_on else 0.55
+		dash_light.light_energy = 2.8 if cabin_lights_on else 0.75
 
 func _on_radio_state_changed(is_on: bool) -> void:
 	if radio_glow != null:
@@ -112,7 +113,7 @@ func _on_radio_state_changed(is_on: bool) -> void:
 
 func _on_radio_message_changed(text: String) -> void:
 	if radio_screen != null:
-		radio_screen.text = "RADIO\n" + (text if text != "" else "OFF")
+		radio_screen.text = "RADIO\n" + ("SIGNAL" if text != "" else "OFF")
 	if radio_label != null:
 		radio_label.text = text
 
@@ -128,9 +129,10 @@ func _set_gauge(needle: Node3D, normalized_value: float) -> void:
 
 func _create_materials() -> void:
 	mat_warm = _mat(Color(0.78, 0.42, 0.18), Color(0.8, 0.32, 0.07), 0.08)
-	mat_warm_emissive = _mat(Color(1.0, 0.58, 0.18), Color(1.0, 0.38, 0.08), 1.3)
-	mat_dark = _mat(Color(0.07, 0.06, 0.055), Color.BLACK, 0.0)
-	mat_metal = _mat(Color(0.22, 0.23, 0.24), Color.BLACK, 0.0)
+	mat_warm_dark = _mat(Color(0.22, 0.13, 0.08), Color(0.55, 0.18, 0.05), 0.18)
+	mat_warm_emissive = _mat(Color(1.0, 0.58, 0.18), Color(1.0, 0.38, 0.08), 1.8)
+	mat_dark = _mat(Color(0.075, 0.055, 0.045), Color(0.15, 0.05, 0.015), 0.04)
+	mat_metal = _mat(Color(0.18, 0.17, 0.16), Color.BLACK, 0.0)
 	mat_red = _mat(Color(1.0, 0.12, 0.05), Color(1.0, 0.05, 0.0), 1.7)
 	mat_green = _mat(Color(0.1, 0.9, 0.38), Color(0.0, 0.8, 0.22), 1.3)
 	mat_blue = _mat(Color(0.32, 0.56, 0.8), Color(0.1, 0.32, 0.55), 0.65)
@@ -150,7 +152,7 @@ func _build_cabin() -> void:
 	_add_box(self, "LeftWall", Vector3(0.22, 3.2, 6.6), Vector3(-3.45, 0.55, 1.7), mat_metal)
 	_add_box(self, "RightWall", Vector3(0.22, 3.2, 6.6), Vector3(3.45, 0.55, 1.7), mat_metal)
 	_add_box(self, "BackWall", Vector3(6.8, 3.2, 0.22), Vector3(0.0, 0.55, 5.0), mat_dark)
-	_add_box(self, "DashBulk", Vector3(6.1, 0.9, 0.85), Vector3(0.0, -0.28, -1.36), mat_metal)
+	_add_box(self, "DashBulk", Vector3(6.1, 0.9, 0.85), Vector3(0.0, -0.28, -1.36), mat_warm_dark)
 
 	_add_box(self, "WindshieldGlass", Vector3(5.3, 1.35, 0.04), Vector3(0.0, 1.25, -1.86), mat_glass)
 	_add_box(self, "WindshieldTopFrame", Vector3(5.8, 0.18, 0.18), Vector3(0.0, 2.05, -1.78), mat_dark)
@@ -170,7 +172,7 @@ func _build_dashboard() -> void:
 	fuel_needle = _build_gauge("FuelGauge", "FUEL", Vector3(-1.25, 0.18, -0.82))
 	heat_needle = _build_gauge("HeatGauge", "HEAT", Vector3(0.0, 0.18, -0.82))
 	engine_needle = _build_gauge("EngineGauge", "ENG", Vector3(1.25, 0.18, -0.82))
-	speed_label = _add_label3d(self, "SpeedLabel", "20 KM/H", Vector3(0.0, -0.42, -0.78), 44, Color(1.0, 0.55, 0.15))
+	speed_label = _add_label3d(self, "SpeedLabel", "20 KM/H", Vector3(0.0, 0.02, -0.76), 34, Color(1.0, 0.58, 0.18))
 
 	var radio := _add_interactable("Radio", "radio", "Toggle radio", Vector3(2.25, -0.22, -0.78), Vector3(0.95, 0.46, 0.22), mat_black)
 	radio_glow = _add_box(radio, "RadioGlow", Vector3(0.7, 0.08, 0.025), Vector3(0.0, 0.12, -0.13), mat_green)
@@ -231,7 +233,7 @@ func _build_lights() -> void:
 	cabin_light = OmniLight3D.new()
 	cabin_light.name = "CabinWarmLight"
 	cabin_light.light_color = Color(1.0, 0.58, 0.24)
-	cabin_light.light_energy = 2.6
+	cabin_light.light_energy = 4.4
 	cabin_light.omni_range = 6.0
 	cabin_light.position = Vector3(0.0, 2.12, 1.7)
 	add_child(cabin_light)
@@ -239,7 +241,7 @@ func _build_lights() -> void:
 	dash_light = OmniLight3D.new()
 	dash_light.name = "DashAmberLight"
 	dash_light.light_color = Color(1.0, 0.42, 0.1)
-	dash_light.light_energy = 1.6
+	dash_light.light_energy = 2.8
 	dash_light.omni_range = 4.0
 	dash_light.position = Vector3(0.0, 0.3, -0.62)
 	add_child(dash_light)
