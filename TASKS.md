@@ -71,12 +71,12 @@
 - [x] Add cabin props that reflect long-term living (junk, tools, personal items)
 - [x] Replace clean materials with worn/dirty materials
 - [x] Add subtle asymmetry and imperfection to cabin geometry
-- [ ] Add at least one "improvised fix" visual (tape, patch, exposed wire)
-- [ ] Add ambient storytelling element (photo, note, object with history)
+- [x] Add at least one "improvised fix" visual (tape, patch, exposed wire)
+- [x] Add ambient storytelling element (photo, note, object with history)
 
 ## ATMOSPHERE TASKS
 
-- [ ] Add distant moving lights outside (other trucks or unknown sources)
+- [x] Add distant moving lights outside (other trucks or unknown sources)
 - [ ] Add abandoned vehicle silhouette on roadside
 - [ ] Add occasional flicker or instability in cabin lighting
 - [ ] Add radio message with dark or cynical tone

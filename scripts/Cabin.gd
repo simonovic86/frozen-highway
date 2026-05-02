@@ -52,6 +52,8 @@ var mat_grime: StandardMaterial3D
 var mat_rust: StandardMaterial3D
 var mat_paper: StandardMaterial3D
 var mat_cloth: StandardMaterial3D
+var mat_tape: StandardMaterial3D
+var mat_wire: StandardMaterial3D
 
 func _ready() -> void:
 	base_camera_pivot_position = camera_pivot.position
@@ -191,6 +193,8 @@ func _create_materials() -> void:
 	mat_rust = _mat(Color(0.36, 0.12, 0.045), Color.BLACK, 0.0)
 	mat_paper = _mat(Color(0.74, 0.68, 0.52), Color.BLACK, 0.0)
 	mat_cloth = _mat(Color(0.18, 0.24, 0.28), Color.BLACK, 0.0)
+	mat_tape = _mat(Color(0.58, 0.57, 0.5), Color.BLACK, 0.0)
+	mat_wire = _mat(Color(0.02, 0.012, 0.008), Color.BLACK, 0.0)
 
 	mat_glass = StandardMaterial3D.new()
 	mat_glass.albedo_color = Color(0.36, 0.62, 0.8, 0.18)
@@ -311,7 +315,27 @@ func _build_personal_objects() -> void:
 	_add_box(self, "GloveLeft", Vector3(0.52, 0.12, 0.26), Vector3(-0.72, -0.84, 2.86), mat_warm_dark)
 	var glove_right := _add_box(self, "GloveRight", Vector3(0.5, 0.12, 0.26), Vector3(-0.2, -0.84, 2.98), mat_warm_dark)
 	glove_right.rotation_degrees.y = 16.0
+	_build_story_note()
+	_build_improvised_fix()
 	hanging_charm = _add_box(self, "HangingCharm", Vector3(0.12, 0.26, 0.04), Vector3(0.45, 1.82, -1.62), mat_warm_emissive)
+
+func _build_story_note() -> void:
+	var note := _add_box(self, "FuelDebtNote", Vector3(0.62, 0.42, 0.025), Vector3(-2.56, 0.18, -0.82), mat_paper)
+	note.rotation_degrees.z = -4.0
+	var note_text := _add_label3d(self, "FuelDebtNoteText", "MARA\n2 CANS\nOWED", Vector3(-2.56, 0.18, -0.845), 18, Color(0.08, 0.07, 0.055))
+	note_text.rotation_degrees.z = -4.0
+	_add_box(self, "NotePin", Vector3(0.09, 0.09, 0.025), Vector3(-2.56, 0.38, -0.86), mat_rust)
+
+func _build_improvised_fix() -> void:
+	var tape_a := _add_box(self, "CrackedFrameTapeA", Vector3(0.72, 0.09, 0.035), Vector3(2.42, 1.82, -1.82), mat_tape)
+	tape_a.rotation_degrees.z = 36.0
+	var tape_b := _add_box(self, "CrackedFrameTapeB", Vector3(0.62, 0.085, 0.035), Vector3(2.55, 1.7, -1.82), mat_tape)
+	tape_b.rotation_degrees.z = -28.0
+	var wire_a := _add_box(self, "ExposedWireA", Vector3(0.045, 0.62, 0.045), Vector3(2.85, 1.46, -1.72), mat_wire)
+	wire_a.rotation_degrees.z = -14.0
+	var wire_b := _add_box(self, "ExposedWireB", Vector3(0.04, 0.5, 0.04), Vector3(2.72, 1.21, -1.71), mat_wire)
+	wire_b.rotation_degrees.z = 22.0
+	_add_box(self, "WireCopperEnd", Vector3(0.06, 0.08, 0.045), Vector3(2.62, 0.98, -1.71), mat_rust)
 
 func _build_wear_marks() -> void:
 	var dash_stain := _add_box(self, "DashCoffeeStain", Vector3(0.62, 0.035, 0.34), Vector3(1.72, -0.78, -0.88), mat_grime)

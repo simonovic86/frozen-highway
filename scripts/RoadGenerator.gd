@@ -10,12 +10,14 @@ var rng := RandomNumberGenerator.new()
 var segments: Array[Node3D] = []
 var snowflakes: Array[MeshInstance3D] = []
 var event_objects: Array[Node3D] = []
+var distant_light_rigs: Array[Node3D] = []
 
 var mat_road: StandardMaterial3D
 var mat_snow: StandardMaterial3D
 var mat_line: StandardMaterial3D
 var mat_dark: StandardMaterial3D
 var mat_light: StandardMaterial3D
+var mat_distant_light: StandardMaterial3D
 var snow_mesh: BoxMesh
 
 func _ready() -> void:
@@ -23,11 +25,13 @@ func _ready() -> void:
 	_create_materials()
 	_build_segments()
 	_build_snow()
+	_build_distant_moving_lights()
 
 func _process(delta: float) -> void:
 	_move_segments(delta)
 	_move_snow(delta)
 	_move_event_objects(delta)
+	_move_distant_lights(delta)
 
 func set_drive_speed(new_speed: float) -> void:
 	drive_speed = new_speed
@@ -77,6 +81,7 @@ func _create_materials() -> void:
 	mat_line = _mat(Color(0.82, 0.88, 0.92), Color(0.18, 0.24, 0.28), 0.08)
 	mat_dark = _mat(Color(0.035, 0.043, 0.052), Color.BLACK, 0.0)
 	mat_light = _mat(Color(0.65, 0.9, 1.0), Color(0.45, 0.8, 1.0), 1.6)
+	mat_distant_light = _mat(Color(1.0, 0.52, 0.24), Color(1.0, 0.32, 0.08), 2.1)
 
 func _build_segments() -> void:
 	for i in segment_count:
@@ -131,6 +136,50 @@ func _move_snow(delta: float) -> void:
 		flake.position.y -= fall * delta
 		if flake.position.z > 8.0 or flake.position.y < -0.6 or absf(flake.position.x) > 18.0:
 			flake.position = _random_snow_position()
+
+func _build_distant_moving_lights() -> void:
+	for i in 4:
+		var rig := Node3D.new()
+		rig.name = "DistantMovingLights%02d" % i
+		rig.position = Vector3(
+			(-1.0 if i % 2 == 0 else 1.0) * rng.randf_range(13.0, 22.0),
+			rng.randf_range(0.6, 1.4),
+			rng.randf_range(-132.0, -42.0)
+		)
+		rig.set_meta("drift", rng.randf_range(-0.65, 0.65))
+		rig.set_meta("phase", rng.randf_range(0.0, TAU))
+		add_child(rig)
+		distant_light_rigs.append(rig)
+
+		for x in [-0.28, 0.28]:
+			var bulb := MeshInstance3D.new()
+			var mesh := SphereMesh.new()
+			mesh.radius = 0.13
+			mesh.height = 0.26
+			bulb.mesh = mesh
+			bulb.material_override = mat_distant_light
+			bulb.position = Vector3(x, 0.0, 0.0)
+			rig.add_child(bulb)
+
+		var glow := OmniLight3D.new()
+		glow.name = "DistantGlow"
+		glow.light_color = Color(1.0, 0.48, 0.22)
+		glow.light_energy = 0.9
+		glow.omni_range = 9.0
+		rig.add_child(glow)
+
+func _move_distant_lights(delta: float) -> void:
+	for rig in distant_light_rigs:
+		var phase := float(rig.get_meta("phase"))
+		var drift := float(rig.get_meta("drift"))
+		rig.position.z += (drive_speed * 0.24 + 2.8) * delta
+		rig.position.x += drift * delta
+		rig.position.y = 1.0 + sin(Time.get_ticks_msec() * 0.0017 + phase) * 0.18
+		rig.scale = Vector3.ONE * (0.82 + sin(Time.get_ticks_msec() * 0.004 + phase) * 0.08)
+		if rig.position.z > 16.0:
+			rig.position.z = rng.randf_range(-150.0, -106.0)
+			rig.position.x = signf(rig.position.x) * rng.randf_range(13.0, 24.0)
+			rig.set_meta("drift", rng.randf_range(-0.65, 0.65))
 
 func _move_event_objects(delta: float) -> void:
 	var movement := drive_speed * delta
