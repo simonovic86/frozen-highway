@@ -317,3 +317,38 @@ Do not let the game become generic survival crafting.
 The game is not about collecting 50 items.
 
 The game is about the feeling of surviving the road from inside a warm metal box.
+
+## Stylistic Direction (Gypsy-inspired tone)
+
+The game should evoke the feeling of gritty European sci-fi trucker worlds.
+
+Key elements:
+
+- Massive, industrial trucks as primary living spaces
+- Lone driver lifestyle
+- Rough, pragmatic, slightly cynical tone
+- Dark humor in radio or events
+- World feels politically or socially fragmented
+- Technology is functional, not futuristic-polished
+- Machinery is dirty, worn, patched, and repaired many times
+
+Cabin details should include:
+
+- Analog controls (buttons, switches, worn labels)
+- Personal clutter (photos, food cans, tools)
+- Signs of long-term habitation
+- Improvised fixes (tape, wires, patched panels)
+
+Outside world should include:
+
+- Endless highways with little civilization
+- Abandoned infrastructure
+- Occasional signs of conflict or decay
+- Strange or unexplained phenomena in distance
+- Other vehicles that feel threatening or unpredictable
+
+IMPORTANT:
+
+Do NOT copy any specific characters, names, storylines, or visual designs from any existing comic or IP.
+
+Only capture the mood, tone, and themes.

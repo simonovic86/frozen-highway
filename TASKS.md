@@ -77,6 +77,6 @@
 ## ATMOSPHERE TASKS
 
 - [x] Add distant moving lights outside (other trucks or unknown sources)
-- [ ] Add abandoned vehicle silhouette on roadside
-- [ ] Add occasional flicker or instability in cabin lighting
+- [x] Add abandoned vehicle silhouette on roadside
+- [x] Add occasional flicker or instability in cabin lighting
 - [ ] Add radio message with dark or cynical tone

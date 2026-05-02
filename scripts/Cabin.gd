@@ -18,6 +18,9 @@ var mouse_sensitivity := 0.0024
 var current_speed := 20.0
 var motion_time := 0.0
 var storm_visual_intensity := 0.0
+var cabin_lights_enabled := true
+var next_light_flicker_time := 3.2
+var light_flicker_time := 0.0
 
 var hint_label: Label
 var radio_label: Label
@@ -86,6 +89,7 @@ func _process(delta: float) -> void:
 	motion_time += delta
 	_update_cabin_motion()
 	_update_wipers()
+	_update_light_flicker(delta)
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventMouseMotion and Input.get_mouse_mode() == Input.MOUSE_MODE_CAPTURED:
@@ -121,12 +125,10 @@ func _on_resources_changed(fuel: float, cabin_heat: float, engine_condition: flo
 		warning_light.material_override = mat_red if engine_condition < 45.0 or fuel < 18.0 else mat_green
 
 func _on_toggles_changed(heater_on: bool, cabin_lights_on: bool) -> void:
+	cabin_lights_enabled = cabin_lights_on
 	if heater_glow != null:
 		heater_glow.material_override = mat_red if heater_on else mat_dark
-	if cabin_light != null:
-		cabin_light.light_energy = 4.4 if cabin_lights_on else 0.35
-	if dash_light != null:
-		dash_light.light_energy = 2.8 if cabin_lights_on else 0.75
+	_apply_light_levels(1.0)
 
 func _on_radio_state_changed(is_on: bool) -> void:
 	if radio_glow != null:
@@ -170,6 +172,27 @@ func _update_wipers() -> void:
 	var angle := lerpf(deg_to_rad(-42.0), deg_to_rad(34.0), sweep)
 	left_wiper.rotation.z = angle
 	right_wiper.rotation.z = angle
+
+func _update_light_flicker(delta: float) -> void:
+	next_light_flicker_time -= delta
+	if next_light_flicker_time <= 0.0:
+		light_flicker_time = 0.18 + absf(sin(motion_time * 1.7)) * 0.16
+		next_light_flicker_time = 3.6 + absf(sin(motion_time * 0.83)) * 4.8
+
+	var flicker := 1.0
+	if light_flicker_time > 0.0:
+		light_flicker_time -= delta
+		var pulse := absf(sin(motion_time * 82.0))
+		flicker = lerpf(0.42, 1.05, pulse)
+	_apply_light_levels(flicker)
+
+func _apply_light_levels(flicker: float) -> void:
+	var cabin_base := 4.4 if cabin_lights_enabled else 0.35
+	var dash_base := 2.8 if cabin_lights_enabled else 0.75
+	if cabin_light != null:
+		cabin_light.light_energy = cabin_base * flicker
+	if dash_light != null:
+		dash_light.light_energy = dash_base * lerpf(0.82, 1.0, flicker)
 
 func _set_gauge(needle: Node3D, normalized_value: float) -> void:
 	if needle == null:

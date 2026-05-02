@@ -105,7 +105,8 @@ func _populate_segment(segment: Node3D, index: int) -> void:
 		_add_box(segment, "DistantSignPost", Vector3(0.12, 1.4, 0.12), Vector3(side * 5.6, 0.0, -8.0), mat_dark)
 		_add_box(segment, "DistantSignFace", Vector3(1.2, 0.55, 0.08), Vector3(side * 5.6, 0.9, -8.0), mat_dark)
 	if index % 3 == 1:
-		_add_box(segment, "FrozenCar", Vector3(1.8, 0.65, 3.0), Vector3(-5.8, -0.45, 4.0), mat_dark)
+		var wreck_side := -1.0 if index % 2 == 1 else 1.0
+		_build_roadside_vehicle_silhouette(segment, wreck_side, 4.0)
 
 func _move_segments(delta: float) -> void:
 	var movement := drive_speed * delta
@@ -136,6 +137,23 @@ func _move_snow(delta: float) -> void:
 		flake.position.y -= fall * delta
 		if flake.position.z > 8.0 or flake.position.y < -0.6 or absf(flake.position.x) > 18.0:
 			flake.position = _random_snow_position()
+
+func _build_roadside_vehicle_silhouette(parent: Node, side: float, z_offset: float) -> void:
+	var wreck := Node3D.new()
+	wreck.name = "RoadsideAbandonedVehicle"
+	wreck.position = Vector3(side * 6.4, -0.54, z_offset)
+	wreck.rotation_degrees.y = side * -7.0
+	parent.add_child(wreck)
+
+	_add_box(wreck, "LongDeadBody", Vector3(2.4, 0.62, 3.6), Vector3(0.0, 0.12, 0.0), mat_dark)
+	_add_box(wreck, "CollapsedCab", Vector3(1.55, 0.72, 1.45), Vector3(0.2, 0.76, -0.62), mat_dark)
+	_add_box(wreck, "SnowLoadedRoof", Vector3(1.7, 0.14, 1.55), Vector3(0.16, 1.18, -0.62), mat_snow)
+	_add_box(wreck, "SnowPackedHood", Vector3(2.25, 0.12, 1.35), Vector3(0.0, 0.5, 1.0), mat_snow)
+	_add_box(wreck, "ColdWindshield", Vector3(1.05, 0.34, 0.06), Vector3(0.2, 0.84, -1.38), mat_light)
+	for x in [-0.92, 0.92]:
+		_add_box(wreck, "BuriedWheel", Vector3(0.38, 0.38, 0.18), Vector3(x, -0.24, -1.05), mat_dark)
+		_add_box(wreck, "BuriedWheel", Vector3(0.38, 0.38, 0.18), Vector3(x, -0.24, 1.05), mat_dark)
+	_add_box(wreck, "LeaningMarker", Vector3(0.08, 1.1, 0.08), Vector3(side * -1.55, 0.3, 1.75), mat_dark)
 
 func _build_distant_moving_lights() -> void:
 	for i in 4:
