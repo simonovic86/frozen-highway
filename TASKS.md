@@ -56,3 +56,8 @@
 - [x] swinging hanging charm
 - [x] storm windshield wipers
 - [x] docs updated for atmosphere pass
+
+## RUN CHECK - 2026-05-03
+- [x] launch Godot 4.6 project
+- [x] confirm main scene starts
+- [x] confirm no startup runtime errors
