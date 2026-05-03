@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 128" width="512" height="128">
+  <defs>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="55"/>
+      <feColorMatrix values="0 0 0 0 0.3  0 0 0 0 0.24  0 0 0 0 0.16  0 0 0 0.45 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+  </defs>
+  <!-- transparent background, just a strip of stickers -->
+  <rect width="512" height="128" fill="none"/>
+  <!-- sticker 1: rad / hazard triangle -->
+  <g transform="translate(56,64)">
+    <polygon points="0,-44 44,32 -44,32" fill="#f0c040" stroke="#1a1208" stroke-width="3"/>
+    <polygon points="0,-30 32,24 -32,24" fill="none" stroke="#1a1208" stroke-width="2"/>
+    <text x="0" y="14" font-family="'Impact', sans-serif" font-size="34" fill="#1a1208" text-anchor="middle" font-weight="900">!</text>
+    <text x="0" y="48" font-family="monospace" font-size="9" fill="#1a1208" text-anchor="middle" font-weight="700">COLD CARGO</text>
+  </g>
+  <!-- sticker 2: route 9 shield -->
+  <g transform="translate(160,60)">
+    <path d="M-30 -34 L30 -34 L34 14 L0 38 L-34 14 Z" fill="#1c2a3e" stroke="#e8c860" stroke-width="3"/>
+    <text x="0" y="-8" font-family="monospace" font-size="11" fill="#e8c860" text-anchor="middle" font-weight="700" letter-spacing="2">ROUTE</text>
+    <text x="0" y="22" font-family="'Impact', sans-serif" font-size="32" fill="#e8c860" text-anchor="middle" font-weight="900">9</text>
+  </g>
+  <!-- sticker 3: NO SMOKING circle -->
+  <g transform="translate(256,60)">
+    <circle r="36" fill="#f0e8d8" stroke="#a02018" stroke-width="4"/>
+    <line x1="-25" y1="-25" x2="25" y2="25" stroke="#a02018" stroke-width="4"/>
+    <!-- cigarette -->
+    <rect x="-18" y="-2" width="24" height="6" fill="#1a1208"/>
+    <rect x="6" y="-2" width="6" height="6" fill="#a04018"/>
+    <line x1="14" y1="0" x2="22" y2="-8" stroke="#a04018" stroke-width="2" opacity="0.6"/>
+  </g>
+  <!-- sticker 4: VORK-TRANS faded brand -->
+  <g transform="translate(360,64)" opacity="0.85">
+    <rect x="-58" y="-22" width="116" height="44" fill="#3a2418" stroke="#a06a30" stroke-width="2"/>
+    <text x="0" y="-2" font-family="'Impact', sans-serif" font-size="18" fill="#e8c860" text-anchor="middle" font-weight="900" letter-spacing="2">VORK-TRANS</text>
+    <text x="0" y="14" font-family="monospace" font-size="9" fill="#c8a878" text-anchor="middle" letter-spacing="3">- KOLDA -</text>
+  </g>
+  <!-- sticker 5: small skull-arrow danger -->
+  <g transform="translate(458,62)">
+    <rect x="-30" y="-22" width="60" height="44" fill="#1a1208" stroke="#e8c860" stroke-width="2"/>
+    <!-- arrow -->
+    <path d="M-22 0 L18 0 M10 -8 L18 0 L10 8" stroke="#e8c860" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <text x="0" y="18" font-family="monospace" font-size="7" fill="#e8c860" text-anchor="middle" font-weight="700">EAST GATE</text>
+  </g>
+  <!-- light grime over all -->
+  <rect width="512" height="128" filter="url(#grain)" opacity="0.35"/>
+</svg>

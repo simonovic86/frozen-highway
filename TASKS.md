@@ -134,3 +134,27 @@
   - engine struggles (no full stop yet)
 - [x] Add recovery possibility:
   - slowing down improves engine
+
+## ART PASS - 2026-05-03
+
+Hybrid approach: keep procedural geometry, layer textured QuadMesh art and Decal nodes on top. Additive only — existing builders untouched.
+
+- [x] Generate SVG art pack under `assets/art/` (~56 KB total)
+  - dashboard_photo.svg (sun-bleached portrait, one face scratched out)
+  - fuel_debt_note.svg (handwritten "MARA / 2 CANS / OWED")
+  - route_stub.svg (dispatch slip "MILE 12 / NO STOP")
+  - dispatch_tag.svg (hanging cargo tag, ROUTE 9)
+  - folded_map.svg (torn road map with pencil X marks)
+  - bunk_poster.svg ("FROZEN HIGHWAY" poster on back wall)
+  - kid_drawing.svg (crayon "DAD + TRUCK")
+  - dash_stickers.svg (route shield, hazard, no-smoking, brand)
+  - warning_label.svg (yellow/black hazard band)
+  - gauge_face.svg (analog dial with tick marks - reserved for future use)
+  - coffee_ring_decal.svg (transparent stain)
+  - dirt_smudge_decal.svg (transparent grime)
+- [x] Add `_apply_art_pack()` and helpers (`_load_art`, `_textured_mat`, `_add_art_quad`, `_add_decal_node`) in Cabin.gd
+- [x] Replace OldPhoto inner box with painted photo QuadMesh
+- [x] Attach textured QuadMesh fronts to FuelDebtNote, RouteStub, HangingDispatchTag, FoldedMap
+- [x] Add bunk poster on back wall, kid drawing on left wall, dash stickers strip, hazard sticker on heater
+- [x] Add Decal nodes for coffee ring on dash and dirt smudges on floor/dash
+- [x] All names original (VORK-TRANS, KOLDA, DROVA, SLATA, Mara) — no IP copied

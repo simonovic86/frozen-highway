@@ -1,0 +1,93 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512" width="384" height="512">
+  <defs>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.85" numOctaves="2" seed="33"/>
+      <feColorMatrix values="0 0 0 0 0.32  0 0 0 0 0.22  0 0 0 0 0.12  0 0 0 0.45 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#1c2a3e"/>
+      <stop offset="1" stop-color="#3a2a18"/>
+    </linearGradient>
+    <radialGradient id="sun" cx="0.5" cy="0.5" r="0.55">
+      <stop offset="0" stop-color="#f0a040"/>
+      <stop offset="1" stop-color="#a04018" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <!-- background -->
+  <rect width="384" height="512" fill="url(#sky)"/>
+  <!-- sun haze -->
+  <circle cx="192" cy="220" r="160" fill="url(#sun)"/>
+  <!-- distant mountains -->
+  <path d="M0 320 L60 280 L120 310 L180 270 L240 300 L300 260 L384 290 L384 360 L0 360 Z" fill="#1a2030" opacity="0.85"/>
+  <!-- foreground highway perspective -->
+  <g>
+    <!-- road -->
+    <polygon points="160,360 224,360 312,512 72,512" fill="#0a0a0e"/>
+    <!-- lane stripes -->
+    <g fill="#e8c860">
+      <polygon points="190,378 194,378 196,394 188,394"/>
+      <polygon points="186,408 198,408 202,432 182,432"/>
+      <polygon points="178,448 206,448 212,484 172,484"/>
+    </g>
+    <!-- snow banks -->
+    <polygon points="0,360 160,360 90,512 0,512" fill="#3a4858" opacity="0.8"/>
+    <polygon points="384,360 224,360 296,512 384,512" fill="#3a4858" opacity="0.8"/>
+  </g>
+  <!-- truck silhouette -->
+  <g transform="translate(192,310)">
+    <!-- cab -->
+    <rect x="-50" y="-50" width="40" height="50" fill="#0a0a0e"/>
+    <rect x="-46" y="-44" width="32" height="20" fill="#f0a040" opacity="0.85"/>
+    <!-- chrome stack -->
+    <rect x="-26" y="-66" width="6" height="20" fill="#0a0a0e"/>
+    <rect x="-14" y="-66" width="6" height="20" fill="#0a0a0e"/>
+    <!-- trailer -->
+    <rect x="-10" y="-46" width="62" height="46" fill="#1a1a22"/>
+    <rect x="-10" y="-44" width="62" height="3" fill="#5a5a62" opacity="0.5"/>
+    <rect x="-10" y="-12" width="62" height="3" fill="#5a5a62" opacity="0.5"/>
+    <!-- wheels -->
+    <circle cx="-40" cy="2" r="6" fill="#0a0a0e"/>
+    <circle cx="-22" cy="2" r="6" fill="#0a0a0e"/>
+    <circle cx="6" cy="2" r="6" fill="#0a0a0e"/>
+    <circle cx="20" cy="2" r="6" fill="#0a0a0e"/>
+    <circle cx="34" cy="2" r="6" fill="#0a0a0e"/>
+    <!-- headlights glow -->
+    <ellipse cx="-50" cy="-22" rx="14" ry="5" fill="#fff8d6" opacity="0.4"/>
+    <ellipse cx="-50" cy="-12" rx="20" ry="5" fill="#f0a040" opacity="0.3"/>
+  </g>
+  <!-- snow flecks -->
+  <g fill="#e0e8f0" opacity="0.7">
+    <circle cx="40" cy="60" r="2"/>
+    <circle cx="120" cy="40" r="1.5"/>
+    <circle cx="220" cy="80" r="2.4"/>
+    <circle cx="290" cy="50" r="1.8"/>
+    <circle cx="340" cy="90" r="2"/>
+    <circle cx="60" cy="140" r="1.6"/>
+    <circle cx="180" cy="180" r="1.4"/>
+    <circle cx="280" cy="160" r="2.2"/>
+    <circle cx="80" cy="220" r="1.4"/>
+    <circle cx="320" cy="240" r="1.6"/>
+    <circle cx="200" cy="260" r="1.8"/>
+  </g>
+  <!-- title -->
+  <g font-family="'Impact', 'Helvetica Neue', sans-serif" text-anchor="middle">
+    <text x="192" y="76" font-size="48" fill="#f0d098" letter-spacing="6" font-weight="900">FROZEN</text>
+    <text x="192" y="120" font-size="48" fill="#f0d098" letter-spacing="6" font-weight="900">HIGHWAY</text>
+    <line x1="80" y1="138" x2="304" y2="138" stroke="#a06a30" stroke-width="2"/>
+    <text x="192" y="166" font-size="14" fill="#c8a878" letter-spacing="8">— ROUTE 9 —</text>
+  </g>
+  <!-- bottom slogan -->
+  <g font-family="monospace" text-anchor="middle">
+    <text x="192" y="466" font-size="16" fill="#e8c860" letter-spacing="3" font-weight="700">KEEP MOVING.</text>
+    <text x="192" y="490" font-size="12" fill="#a08858" letter-spacing="4">VORK-TRANS  //  EST. KOLDA</text>
+  </g>
+  <!-- torn corner -->
+  <path d="M384 0 L350 0 L384 38 Z" fill="#1c2a3e" opacity="0.85"/>
+  <path d="M384 0 L362 0 L384 22 Z" fill="#0a1018"/>
+  <!-- pin / tape -->
+  <rect x="170" y="-4" width="44" height="22" fill="#dac890" opacity="0.85" transform="rotate(-3 192 8)"/>
+  <rect x="172" y="-4" width="40" height="20" fill="#cab87e" opacity="0.7" transform="rotate(-3 192 8)"/>
+  <!-- grain -->
+  <rect width="384" height="512" filter="url(#grain)" opacity="0.55"/>
+</svg>

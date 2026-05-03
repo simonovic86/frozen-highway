@@ -1,0 +1,43 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320" width="240" height="320">
+  <defs>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="1.0" numOctaves="2" seed="14"/>
+      <feColorMatrix values="0 0 0 0 0.32  0 0 0 0 0.26  0 0 0 0 0.18  0 0 0 0.45 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <linearGradient id="card" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#dac890"/>
+      <stop offset="1" stop-color="#b09858"/>
+    </linearGradient>
+  </defs>
+  <!-- shipping tag shape (notched top) -->
+  <path d="M40 0 L200 0 L240 60 L240 320 L0 320 L0 60 Z" fill="url(#card)" stroke="#3a2410" stroke-width="2"/>
+  <!-- string hole -->
+  <circle cx="120" cy="40" r="14" fill="#1a1208"/>
+  <circle cx="120" cy="40" r="8" fill="#0a0604"/>
+  <circle cx="120" cy="40" r="4" fill="#1a1208"/>
+  <!-- header band -->
+  <rect x="20" y="80" width="200" height="34" fill="#3a2410"/>
+  <text x="120" y="103" font-family="monospace" font-size="20" fill="#e8d8a8" text-anchor="middle" font-weight="700" letter-spacing="3">ROUTE 9</text>
+  <!-- body fields -->
+  <g font-family="monospace" fill="#1a1208">
+    <text x="20" y="148" font-size="12">CARGO :</text>
+    <text x="20" y="172" font-size="22" font-weight="700">14 TONS</text>
+    <text x="20" y="208" font-size="12">TEMP :</text>
+    <text x="20" y="232" font-size="22" font-weight="700">-22 C</text>
+    <text x="20" y="268" font-size="12">DEST :</text>
+    <text x="20" y="292" font-size="22" font-weight="700" letter-spacing="2">KOLDA</text>
+  </g>
+  <!-- red urgent stamp -->
+  <g transform="translate(120,260) rotate(-18)" opacity="0.65">
+    <rect x="-66" y="-15" width="132" height="30" fill="none" stroke="#a02018" stroke-width="2.5"/>
+    <text x="0" y="6" font-family="monospace" font-size="18" fill="#a02018" text-anchor="middle" font-weight="700">DELIVER COLD</text>
+  </g>
+  <!-- creases -->
+  <line x1="0" y1="160" x2="240" y2="158" stroke="#7a5a30" stroke-width="0.9" opacity="0.4"/>
+  <line x1="120" y1="80" x2="120" y2="320" stroke="#7a5a30" stroke-width="0.7" opacity="0.3"/>
+  <!-- corner wear -->
+  <path d="M240 320 L210 320 L240 296 Z" fill="#8c7438" opacity="0.7"/>
+  <!-- grain -->
+  <rect width="240" height="320" filter="url(#grain)" opacity="0.55"/>
+</svg>

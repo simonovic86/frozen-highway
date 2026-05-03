@@ -4,6 +4,7 @@ const CabinInteractableScript := preload("res://scripts/CabinInteractable.gd")
 const CLOSE_INTERACTION_DISTANCE := 3.45
 const EASY_INTERACTION_DISTANCE := 3.55
 const HOLD_INTERACTION_DURATION := 0.5
+const ART_PATH := "res://assets/art/"
 
 @onready var camera_pivot := $CameraPivot
 @onready var camera := $CameraPivot/Camera3D
@@ -90,6 +91,7 @@ func _ready() -> void:
 	_build_personal_objects()
 	_build_lights()
 	_build_overlay()
+	_apply_art_pack()
 	interaction_ray.focus_text_changed.connect(_on_focus_text_changed)
 
 func setup(new_resource_state: Node, new_radio_system: Node, new_truck_controller: Node, new_event_manager: Node) -> void:
@@ -647,6 +649,109 @@ func _build_overlay() -> void:
 	inspect_label.add_theme_font_size_override("font_size", 22)
 	inspect_label.modulate = Color(1.0, 0.86, 0.62)
 	layer.add_child(inspect_label)
+
+# ---------------- ART PACK ----------------
+# Additive layer that adds textured QuadMesh art and Decal nodes on top of the
+# procedural cabin. Keeps the existing geometry untouched; if textures fail to
+# load the cabin still renders normally with its flat-color materials.
+
+func _apply_art_pack() -> void:
+	_apply_existing_prop_art()
+	_build_freestanding_art()
+	_build_atmosphere_decals()
+
+func _apply_existing_prop_art() -> void:
+	# OldPhoto: replace the procedural blue inner box with the painted photo.
+	var old_photo := get_node_or_null("OldPhoto")
+	if old_photo:
+		var existing_image := old_photo.get_node_or_null("PhotoImage")
+		if existing_image:
+			existing_image.queue_free()
+		_add_art_quad(old_photo, "PhotoArt", Vector2(0.55, 0.36), Vector3(0.0, 0.0, 0.04), Vector3.ZERO, _textured_mat("dashboard_photo.svg", false, 0.06))
+	# Paper props: drop a textured quad just in front of each backing box.
+	var note := get_node_or_null("FuelDebtNote")
+	if note:
+		_add_art_quad(note, "Art", Vector2(0.6, 0.4), Vector3(0.0, 0.0, 0.014), Vector3.ZERO, _textured_mat("fuel_debt_note.svg"))
+	var stub := get_node_or_null("RouteStub")
+	if stub:
+		_add_art_quad(stub, "Art", Vector2(0.46, 0.3), Vector3(0.0, 0.0, 0.013), Vector3.ZERO, _textured_mat("route_stub.svg"))
+	var tag := get_node_or_null("HangingDispatchTag")
+	if tag:
+		_add_art_quad(tag, "Art", Vector2(0.32, 0.4), Vector3(0.0, 0.0, 0.013), Vector3.ZERO, _textured_mat("dispatch_tag.svg"))
+	# Folded map sits flat on the seat; rotate the quad to face up.
+	var map := get_node_or_null("FoldedMap")
+	if map:
+		_add_art_quad(map, "Art", Vector2(0.84, 0.56), Vector3(0.0, 0.012, 0.0), Vector3(-90.0, 0.0, 0.0), _textured_mat("folded_map.svg"))
+
+func _build_freestanding_art() -> void:
+	# Bunk poster on the back wall — visible when the player turns around.
+	var poster := _add_art_quad(self, "BunkPoster", Vector2(0.92, 1.22), Vector3(1.4, 1.4, 4.88), Vector3(0.0, 180.0, 0.0), _textured_mat("bunk_poster.svg"))
+	poster.rotation.z = deg_to_rad(2.0)
+	# Kid's crayon drawing taped to the inner face of the left wall.
+	var left_wall := get_node_or_null("LeftWall")
+	if left_wall:
+		var kid_art := _add_art_quad(left_wall, "KidDrawing", Vector2(0.42, 0.28), Vector3(0.13, -0.15, -1.0), Vector3(0.0, 90.0, 0.0), _textured_mat("kid_drawing.svg"))
+		kid_art.rotation.z = deg_to_rad(-3.5)
+	# Sticker strip taped along the upper dashboard edge, tilted toward the driver.
+	_add_art_quad(self, "DashStickers", Vector2(2.4, 0.6), Vector3(0.55, 0.5, -0.93), Vector3(-22.0, 0.0, 0.0), _textured_mat("dash_stickers.svg", true))
+	# Hazard sticker on the heater unit.
+	var heater := get_node_or_null("Heater")
+	if heater:
+		_add_art_quad(heater, "WarningArt", Vector2(0.36, 0.13), Vector3(0.0, 0.18, 0.115), Vector3.ZERO, _textured_mat("warning_label.svg"))
+
+func _build_atmosphere_decals() -> void:
+	# Coffee ring on the dashboard top — projected straight down.
+	_add_decal_node(self, "DashCoffeeRingDecal", Vector3(0.5, 0.18, 0.5), Vector3(1.55, 0.18, -1.0), Vector3.ZERO, "coffee_ring_decal.svg")
+	# Dirt smudges: one on the floor in front of the seat, one on the dash top.
+	_add_decal_node(self, "FloorDirtDecal", Vector3(1.7, 0.4, 1.1), Vector3(-0.4, -0.9, 1.0), Vector3.ZERO, "dirt_smudge_decal.svg")
+	_add_decal_node(self, "DashSmudgeDecal", Vector3(1.1, 0.18, 0.7), Vector3(-1.2, 0.18, -0.95), Vector3(0.0, 18.0, 0.0), "dirt_smudge_decal.svg")
+
+func _load_art(filename: String) -> Texture2D:
+	return load(ART_PATH + filename)
+
+func _textured_mat(filename: String, transparent: bool = false, emission_energy: float = 0.0) -> StandardMaterial3D:
+	var material := StandardMaterial3D.new()
+	var texture := _load_art(filename)
+	material.albedo_texture = texture
+	material.albedo_color = Color.WHITE
+	material.roughness = 0.92
+	material.cull_mode = BaseMaterial3D.CULL_BACK
+	if transparent:
+		material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	if emission_energy > 0.0:
+		material.emission_enabled = true
+		material.emission_texture = texture
+		material.emission_operator = BaseMaterial3D.EMISSION_OP_MULTIPLY
+		material.emission = Color.WHITE
+		material.emission_energy_multiplier = emission_energy
+	return material
+
+func _add_art_quad(parent: Node, name: String, size_xy: Vector2, position: Vector3, rotation_degrees: Vector3, material: Material) -> MeshInstance3D:
+	var mesh := QuadMesh.new()
+	mesh.size = size_xy
+	var instance := MeshInstance3D.new()
+	instance.name = name
+	instance.mesh = mesh
+	instance.material_override = material
+	instance.position = position
+	instance.rotation_degrees = rotation_degrees
+	parent.add_child(instance)
+	return instance
+
+func _add_decal_node(parent: Node, name: String, size: Vector3, position: Vector3, rotation_degrees: Vector3, texture_filename: String) -> Decal:
+	var decal := Decal.new()
+	decal.name = name
+	decal.texture_albedo = _load_art(texture_filename)
+	decal.size = size
+	decal.position = position
+	decal.rotation_degrees = rotation_degrees
+	decal.albedo_mix = 1.0
+	decal.upper_fade = 0.3
+	decal.lower_fade = 0.3
+	parent.add_child(decal)
+	return decal
+
+# ---------------- /ART PACK ----------------
 
 func _add_interactable(name: String, action_id: String, label: String, position: Vector3, size: Vector3, material: Material, max_interaction_distance: float = 3.0, hold_duration: float = 0.0) -> StaticBody3D:
 	var body: StaticBody3D = CabinInteractableScript.new()

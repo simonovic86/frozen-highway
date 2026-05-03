@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 220" width="320" height="220">
+  <defs>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="2" seed="7"/>
+      <feColorMatrix values="0 0 0 0 0.32  0 0 0 0 0.26  0 0 0 0 0.18  0 0 0 0.5 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <linearGradient id="paper" x1="0" y1="0" x2="0.4" y2="1">
+      <stop offset="0" stop-color="#f0e0b4"/>
+      <stop offset="1" stop-color="#cab87e"/>
+    </linearGradient>
+  </defs>
+  <rect width="320" height="220" fill="url(#paper)"/>
+  <!-- ruled lines -->
+  <g stroke="#a08438" stroke-width="0.8" opacity="0.45">
+    <line x1="14" y1="58" x2="306" y2="58"/>
+    <line x1="14" y1="100" x2="306" y2="100"/>
+    <line x1="14" y1="142" x2="306" y2="142"/>
+    <line x1="14" y1="184" x2="306" y2="184"/>
+  </g>
+  <!-- handwritten scrawl: MARA / 2 CANS / OWED -->
+  <g font-family="'Courier New', monospace" fill="#1f1808" stroke="#1f1808" stroke-width="0.6">
+    <text x="32" y="62" font-size="42" transform="rotate(-3 32 62)" font-weight="700" letter-spacing="6">MARA</text>
+    <text x="30" y="108" font-size="36" transform="rotate(-1 30 108)" font-weight="700" letter-spacing="4">2 CANS</text>
+    <text x="30" y="152" font-size="36" transform="rotate(2 30 152)" font-weight="700" letter-spacing="4">OWED</text>
+    <!-- underline -->
+    <path d="M28 158 Q108 164 196 156" stroke="#1f1808" stroke-width="2.5" fill="none"/>
+    <!-- date stamp -->
+    <text x="32" y="200" font-size="18" font-weight="600" opacity="0.7" transform="rotate(-2 32 200)">14.II - kolda fuel</text>
+  </g>
+  <!-- coffee ring -->
+  <circle cx="246" cy="56" r="28" fill="none" stroke="#5b3a14" stroke-width="3" opacity="0.55"/>
+  <circle cx="246" cy="56" r="22" fill="none" stroke="#5b3a14" stroke-width="1.5" opacity="0.3"/>
+  <!-- crumple folds -->
+  <line x1="160" y1="0" x2="158" y2="220" stroke="#a08438" stroke-width="0.8" opacity="0.5"/>
+  <line x1="0" y1="110" x2="320" y2="108" stroke="#a08438" stroke-width="0.8" opacity="0.4"/>
+  <!-- torn corner -->
+  <polygon points="280,0 320,0 320,28" fill="#cab87e"/>
+  <polygon points="288,0 320,0 320,22 304,8" fill="#a08438" opacity="0.4"/>
+  <!-- pin hole top -->
+  <circle cx="160" cy="14" r="3.6" fill="#3a2814" opacity="0.7"/>
+  <circle cx="160" cy="14" r="1.8" fill="#0a0604"/>
+  <!-- grain -->
+  <rect width="320" height="220" filter="url(#grain)" opacity="0.55"/>
+</svg>

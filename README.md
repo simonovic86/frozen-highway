@@ -63,6 +63,32 @@ res://
   scenes/
   scripts/
   assets/
+    art/        # SVG art pack (photos, notes, posters, decals)
+
+---
+
+## ART PACK
+
+Cabin art (photos, notes, posters, stickers, decals) lives as SVG files under
+`assets/art/`. `Cabin.gd` loads them in `_apply_art_pack()` and layers them
+onto the procedural geometry as `QuadMesh` art and `Decal` nodes — no model
+changes. To swap art, drop a replacement SVG with the same filename and reload
+the scene.
+
+### Testing the art pass
+
+- Look at the dashboard — the inspectable old photo now shows a painted scene
+  with one face scratched out (matches the inspect line).
+- Look at the FuelDebtNote, RouteStub, and the hanging dispatch tag — they
+  show painted handwritten notes instead of plain Label3D text.
+- Look at the folded map on the seat — top face shows a torn road map with
+  pencil X marks and margin notes.
+- Turn around (rotate camera ~180°) — the bunk wall has a "FROZEN HIGHWAY"
+  poster slightly crooked.
+- Glance left at the cabin wall — a kid's crayon drawing is taped there.
+- Look at the heater — a yellow/black hazard sticker is stuck to it.
+- Notice the dashboard top: coffee ring decal and a dirt smudge.
+- The floor in front of the seat has a dirt smudge decal.
 
 ---
 

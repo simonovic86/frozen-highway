@@ -1,0 +1,67 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256">
+  <defs>
+    <filter id="grain" x="0" y="0" width="100%" height="100%">
+      <feTurbulence type="fractalNoise" baseFrequency="1.4" numOctaves="2" seed="29"/>
+      <feColorMatrix values="0 0 0 0 0.95  0 0 0 0 0.6  0 0 0 0 0.18  0 0 0 0.18 0"/>
+      <feComposite in2="SourceGraphic" operator="in"/>
+    </filter>
+    <radialGradient id="dial" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="0" stop-color="#2a1a0c"/>
+      <stop offset="1" stop-color="#0a0604"/>
+    </radialGradient>
+  </defs>
+  <rect width="256" height="256" fill="none"/>
+  <!-- dial background -->
+  <circle cx="128" cy="128" r="120" fill="url(#dial)" stroke="#3a2410" stroke-width="3"/>
+  <!-- inner ring -->
+  <circle cx="128" cy="128" r="106" fill="none" stroke="#a06a30" stroke-width="1.5" opacity="0.6"/>
+  <!-- arc tick range -->
+  <g transform="translate(128,128)" stroke="#f0c060" stroke-linecap="round">
+    <!-- major ticks -->
+    <g stroke-width="3">
+      <line x1="0" y1="-100" x2="0" y2="-86" transform="rotate(-125)"/>
+      <line x1="0" y1="-100" x2="0" y2="-86" transform="rotate(-90)"/>
+      <line x1="0" y1="-100" x2="0" y2="-86" transform="rotate(-50)"/>
+      <line x1="0" y1="-100" x2="0" y2="-86" transform="rotate(0)"/>
+      <line x1="0" y1="-100" x2="0" y2="-86" transform="rotate(50)"/>
+      <line x1="0" y1="-100" x2="0" y2="-86" transform="rotate(90)"/>
+      <line x1="0" y1="-100" x2="0" y2="-86" transform="rotate(125)"/>
+    </g>
+    <!-- minor ticks -->
+    <g stroke-width="1.5" opacity="0.7">
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(-115)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(-105)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(-80)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(-70)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(-60)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(-40)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(-30)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(-20)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(-10)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(10)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(20)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(30)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(40)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(60)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(70)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(80)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(105)"/>
+      <line x1="0" y1="-100" x2="0" y2="-92" transform="rotate(115)"/>
+    </g>
+    <!-- danger zone arc -->
+    <path d="M -82 -57 A 100 100 0 0 0 -100 0" stroke="#d04018" stroke-width="6" fill="none" opacity="0.85"/>
+    <!-- numbers -->
+    <g fill="#f0c060" font-family="monospace" font-size="14" text-anchor="middle">
+      <text x="-72" y="-66">0</text>
+      <text x="0" y="-72">.</text>
+      <text x="72" y="-66">F</text>
+    </g>
+    <!-- center hub -->
+    <circle r="10" fill="#1a0c08" stroke="#f0c060" stroke-width="1.5"/>
+    <circle r="3" fill="#f0c060"/>
+  </g>
+  <!-- light grime -->
+  <circle cx="128" cy="128" r="120" filter="url(#grain)" opacity="0.4"/>
+  <!-- subtle glass highlight -->
+  <ellipse cx="100" cy="78" rx="60" ry="22" fill="#ffffff" opacity="0.06"/>
+</svg>
